@@ -36,7 +36,7 @@ func New(
 	settingsFile string,
 ) {
 	_mu = &sync.Mutex{}
-	_app = app.New()
+	_app = app.NewWithID("opg-aws-key-rotation")
 
 	_settings = LoadSettings(filepath.Join(project.ROOT_DIR, settingsFile))
 	_rotateFrequency = _settings.RotationFrequency
