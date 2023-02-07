@@ -3,8 +3,6 @@ package opgapp
 import (
 	"fmt"
 	"time"
-
-	"github.com/k0kubun/pp"
 )
 
 // UpdateMenu is called frequently via a go routine to check the status
@@ -12,7 +10,7 @@ import (
 func UpdateMenu() {
 	now := time.Now().UTC()
 	at := _track.RotateAt(_rotateFrequency)
-	pp.Printf("[%s] next rotation at [%s]\n", now, at)
+	fmt.Printf("[%s] next rotation at [%s]\n", now, at)
 
 	_mu.Lock()
 	if _track.Locked() && _track.LockIsOld() {
@@ -37,7 +35,7 @@ func UpdateMenu() {
 // that the rotate failed or was cancelled and therefore
 // cleanup the file and carry on
 func MenuKeyOldLock() {
-	pp.Println("Key is locked and too old, so removing...")
+	fmt.Println("Key is locked and too old, so removing...")
 	_track.Unlock()
 }
 
@@ -45,7 +43,7 @@ func MenuKeyOldLock() {
 // lock file present on the filesystem and there presume
 // a rotate is in progress
 func MenuKeyLocked() {
-	pp.Println("Key is locked...")
+	fmt.Println("Key is locked...")
 	_menuInformation.Label = _labels.Locked
 	_menu.Refresh()
 }
@@ -53,7 +51,7 @@ func MenuKeyLocked() {
 // MenuRotate handles the gui changes and func calls to change
 // a key and show the status of that change
 func MenuRotate() {
-	pp.Println("Rotating key...")
+	fmt.Println("Rotating key...")
 	_track.Lock()
 
 	_menuInformation.Label = _labels.Rotating

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
-	"github.com/k0kubun/pp"
 )
 
 func SetupStandardMenu() {
@@ -29,7 +28,7 @@ func SetupStandardMenu() {
 	go func() {
 		dur := time.Minute
 		for range time.Tick(dur) {
-			pp.Println("tick")
+			fmt.Println("tick")
 			UpdateMenu()
 		}
 	}()
