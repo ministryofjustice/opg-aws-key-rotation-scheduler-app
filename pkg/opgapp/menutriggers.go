@@ -13,6 +13,7 @@ import (
 // of access key, trigger gui updates and funcs to update the key
 func UpdateMenu(
 	info *fyne.MenuItem,
+	rotate *fyne.MenuItem,
 	menu *fyne.Menu,
 	key *AccessKeyTracker,
 	s *Settings,
@@ -33,12 +34,13 @@ func UpdateMenu(
 	if key.Locked() {
 		MenuKeyLocked(info, menu, key, s)
 	} else if now.After(at) {
-		key = MenuRotate(info, menu, key, s)
+		key = MenuRotate(info, rotate, menu, key, s)
 	} else {
 		at = key.RotateAt(s.RotationFrequency)
 		info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
 
 	}
+	rotate.Disabled = false
 	menu.Refresh()
 
 	mu.Unlock()
@@ -77,6 +79,7 @@ func MenuKeyLocked(
 // a key and show the status of that change
 func MenuRotate(
 	info *fyne.MenuItem,
+	rotate *fyne.MenuItem,
 	menu *fyne.Menu,
 	key *AccessKeyTracker,
 	s *Settings,
@@ -86,14 +89,22 @@ func MenuRotate(
 	key.Lock()
 	// add icon change - UPDATING
 	info.Label = s.Labels.Rotating
+	rotate.Disabled = true
 	menu.Refresh()
 
-	RotateCommand(s)
+	err := RotateCommand(s)
+	// only rotate when there are no errors
+	if err == nil {
+		key.Unlock()
+		key = key.Rotate()
+		// add icon change - NORMAL
+		at := key.RotateAt(s.RotationFrequency)
+		info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
+		rotate.Disabled = false
+	} else {
 
-	key.Unlock()
-	key = key.Rotate()
-	// add icon change - NORMAL
-	at := key.RotateAt(s.RotationFrequency)
-	info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
+		MenuKeyLocked(info, menu, key, s)
+	}
+	menu.Refresh()
 	return key
 }

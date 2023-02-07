@@ -1,7 +1,6 @@
 package opgapp
 
 type Labels struct {
-	Init         string `json:"init"`
 	NextRotation string `json:"next_rotation"`
 	Rotate       string `json:"rotate"`
 	Rotating     string `json:"rotating"`
