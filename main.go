@@ -4,91 +4,120 @@ import (
 	"fmt"
 	"opg-aws-key-rotation-scheduler-app/internal/project"
 	"opg-aws-key-rotation-scheduler-app/pkg/opgapp"
-	"os/exec"
+	"sync"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/driver/desktop"
+	"github.com/k0kubun/pp"
 )
 
 const (
 	SettingsFile string = "/settings.json"
 )
 
+// Shard vars between top level funcstions
+var (
+	settings         *opgapp.Settings
+	accessKeyTracker *opgapp.AccessKeyTracker
+	supports         opgapp.Supports
+)
+
+// mutex lock
+
 func updateInformationMenu(
 	info *fyne.MenuItem,
+	menu *fyne.Menu,
 	key *opgapp.AccessKeyTracker,
 	s *opgapp.Settings,
-) {
+	mu *sync.Mutex,
+) *opgapp.AccessKeyTracker {
+
 	now := time.Now().UTC()
-	at := key.RotateAt(s.Menu.Rotation.Frequency)
+	at := key.RotateAt(s.RotationFrequency)
+	lockfile := s.AccessKeys.LockFile()
+	current := s.AccessKeys.CurrentFile()
 
-	// - if lock file exists, change menu to show
-	// - if the key is old, start the rotation process
-	// - otherwise show the details of the key
-	if key.Locked(s.LockFilepath()) {
-		info.Label = s.Menu.Labels.Locked
+	pp.Printf("[%s] next rotation at [%s]\n", now, at)
 
+	mu.Lock()
+
+	if key.Locked(lockfile) && time.Since(key.LockedAt(lockfile)) > time.Hour {
+		pp.Println("Key is locked and too old, so removing...")
+		key.Unlock(lockfile)
+	} else if key.Locked(lockfile) {
+		pp.Println("Key is locked...")
+		info.Label = s.Labels.Locked
+		// add icon change - LOCKED
+		menu.Refresh()
 	} else if now.After(at) {
-		info.Label = s.Menu.Labels.Rotating
-		key.Lock(s.LockFilepath())
+		pp.Println("Rotating key...")
+		key.Lock(lockfile)
+		// add icon change - UPDATING
+		info.Label = s.Labels.Rotating
+		menu.Refresh()
+
 		opgapp.RotateCommand(s)
-		// 	key = key.Rotate(s.CurrentAccessKeyFilepath())
-		// 	at = key.RotateAt(s.Menu.Rotation.Frequency)
+		key.Unlock(lockfile)
+		key = key.Rotate(current)
 
+		// add icon change - NORMAL
+		at = key.RotateAt(s.RotationFrequency)
+		info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
 	} else {
-		info.Label = fmt.Sprintf(s.Menu.Labels.NextRotation, at.Format(s.Menu.Rotation.DateFormat))
-	}
+		at = key.RotateAt(s.RotationFrequency)
+		info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
 
+	}
+	menu.Refresh()
+
+	mu.Unlock()
+	return key
 }
 
 func main() {
-	var accessKey opgapp.AccessKeyTracker
-	var settings opgapp.Settings
-
-	var rotate, information, noVault *fyne.MenuItem
+	mu := &sync.Mutex{}
+	var rotate, information, errorMsg *fyne.MenuItem
 	var menu *fyne.Menu
-	var hasVault bool = false
+	var a fyne.App = app.New()
 
 	settings = opgapp.LoadSettings(project.ROOT_DIR + SettingsFile)
-	// look for aws vault on the host machine
-	if _, err := exec.LookPath(settings.AwsVault.Command); err == nil {
-		hasVault = true
-	}
+	// supported checks
+	supports = opgapp.IsSupported(settings, a)
 
 	// create base files and structure for the app
 	opgapp.Bootstrap(settings)
 	// fetch last key data
-	accessKey, _ = opgapp.CurrentAccessKey(settings)
+	accessKeyTracker, _ = opgapp.CurrentAccessKey(settings)
 
 	// create the app menus
+	//	- rotate
 	rotate = fyne.NewMenuItem("Rotate", func() {})
-	information = fyne.NewMenuItem("", func() {})
+	//	- information
+	at := accessKeyTracker.RotateAt(settings.RotationFrequency)
+	information = fyne.NewMenuItem(fmt.Sprintf(settings.Labels.NextRotation, at.Format(settings.DateTimeFormat)), func() {})
 	information.Disabled = true
+	// - error message about app state (missing requirements etc)
+	errorMsg = fyne.NewMenuItem("", func() {})
+	errorMsg.Disabled = true
 
-	noVault = fyne.NewMenuItem(settings.AwsVault.NotFoundError, func() {})
-	noVault.Disabled = true
-
-	// generate the app
-	a := app.New()
-
-	if desk, ok := a.(desktop.App); ok {
-		// if aws vault is installed, run the app as standard
-		if hasVault {
-			menu = fyne.NewMenu(settings.Name, rotate, information)
-			desk.SetSystemTrayMenu(menu)
-			updateInformationMenu(information, &accessKey, &settings)
-
-			go func() {
-				updateInformationMenu(information, &accessKey, &settings)
-			}()
-
-		} else {
-			// otherwise show an error in the app
-			menu = fyne.NewMenu(settings.Name, noVault)
-			desk.SetSystemTrayMenu(menu)
-		}
+	desk, _ := a.(desktop.App)
+	// happy path, all supported
+	if supports.Os && supports.Desktop && supports.AwsVault {
+		menu = fyne.NewMenu(settings.Name, rotate, information)
+		desk.SetSystemTrayMenu(menu)
+		go func() {
+			for range time.Tick(time.Minute) {
+				pp.Println("tick")
+				accessKeyTracker = updateInformationMenu(information, menu, accessKeyTracker, settings, mu)
+			}
+		}()
+	} else if supports.Os && supports.Desktop {
+		// AWS Vault is not installed
+		errorMsg.Label = settings.Errors.AwsVaultNotFoundError
+		menu = fyne.NewMenu(settings.Name, errorMsg)
+		desk.SetSystemTrayMenu(menu)
 	}
 
 	a.Run()

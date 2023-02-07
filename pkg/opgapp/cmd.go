@@ -8,26 +8,28 @@ import (
 
 func RotateCommand(
 	s *Settings,
-) {
+) error {
 
-	// -- MAC ONLY
-	zsh, _ := exec.LookPath(s.AwsVault.Shell) //"zsh"
-
+	osCfg := s.AwsVault.OsSpecific()
+	// MAC ONLY
+	// 	- aws-vault rotate identity --prompt=osascript
+	zsh, _ := exec.LookPath(osCfg.Shell)
 	c := &exec.Cmd{
 		Path: zsh,
 		Args: []string{
 			"-s", "-c",
-			// "aws-vault rotate identity --prompt=osascript"
+
 			fmt.Sprintf(
 				"%s rotate %s --prompt=%s",
-				s.AwsVault.Command,
-				s.AwsVault.Profile,
-				s.AwsVault.Prompt,
+				osCfg.Command,
+				osCfg.Profile,
+				osCfg.Prompt,
 			),
 		},
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}
-	c.Run()
+
+	return c.Run()
 
 }

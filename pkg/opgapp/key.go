@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"time"
-
-	"github.com/k0kubun/pp"
 )
 
 var accessKeyFileMode fs.FileMode = 0644
@@ -16,24 +14,31 @@ type AccessKeyTracker struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
+// RotateAt returns a timestamp of when this AccessKeyTracker should
+// trigger the next rotation command
 func (k *AccessKeyTracker) RotateAt(frequency string) time.Time {
 	dur, _ := time.ParseDuration(frequency)
 	return k.Timestamp.Add(dur)
 }
 
+// JsonBytes converts this struct into marshaled []byte
+// ready to write to a file
 func (k *AccessKeyTracker) JsonBytes() (content []byte) {
 	content, _ = json.Marshal(k)
 	return
 }
 
+// Lock generates the lock file to mark that the key rotation is happening
 func (k *AccessKeyTracker) Lock(lockfile string) {
-	pp.Println("write file - " + lockfile)
 	ioutil.WriteFile(lockfile, k.JsonBytes(), accessKeyFileMode)
 }
+
+// Unlock remove the lock file once the rotation is complete
 func (k *AccessKeyTracker) Unlock(lockfile string) error {
 	return os.Remove(lockfile)
 }
 
+// Locked checks if the lock file exists
 func (k *AccessKeyTracker) Locked(lockfile string) (locked bool) {
 	locked = false
 	if _, err := os.Stat(lockfile); err == nil {
@@ -42,10 +47,17 @@ func (k *AccessKeyTracker) Locked(lockfile string) (locked bool) {
 	return
 }
 
-func (k *AccessKeyTracker) Rotate(file string) (key *AccessKeyTracker) {
+func (k *AccessKeyTracker) LockedAt(lockfile string) time.Time {
+	key := &AccessKeyTracker{}
+	content, _ := ioutil.ReadFile(lockfile)
+	json.Unmarshal([]byte(content), &key)
+	return key.Timestamp
+}
+
+// Rotate updates self to be a new version with own timestamp
+func (k *AccessKeyTracker) Rotate(file string) *AccessKeyTracker {
 	newK, _ := NewAccessKey().Save(file)
-	key = &newK
-	return
+	return &newK
 }
 
 // Save doesnt use pointer so it is chained (NewAccessKey().Save())
@@ -55,9 +67,9 @@ func (k AccessKeyTracker) Save(file string) (AccessKeyTracker, error) {
 }
 
 // == new and current
-func CurrentAccessKey(s Settings) (key AccessKeyTracker, err error) {
-	key = AccessKeyTracker{}
-	content, err := ioutil.ReadFile(s.CurrentAccessKeyFilepath())
+func CurrentAccessKey(s *Settings) (key *AccessKeyTracker, err error) {
+	key = &AccessKeyTracker{}
+	content, err := ioutil.ReadFile(s.AccessKeys.CurrentFile())
 	json.Unmarshal([]byte(content), &key)
 	return
 }
