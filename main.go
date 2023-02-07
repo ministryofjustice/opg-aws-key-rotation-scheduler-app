@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"opg-aws-key-rotation-scheduler-app/internal/project"
 	"opg-aws-key-rotation-scheduler-app/pkg/opgapp"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -81,7 +82,8 @@ func main() {
 		menu = fyne.NewMenu(settings.Name, errorMsg)
 		desk.SetSystemTrayMenu(menu)
 	}
-
+	icons := settings.Icons.Themed(settings)
+	a.SetIcon(icons.Default())
 	accessKeyTracker = opgapp.UpdateMenu(information, rotate, menu, accessKeyTracker, settings, mu)
 	a.Run()
 
