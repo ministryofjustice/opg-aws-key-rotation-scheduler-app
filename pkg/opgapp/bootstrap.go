@@ -16,8 +16,7 @@ func Bootstrap(s *Settings) (err error) {
 	// create the current access key info if it doesnt exist
 	currentFile := s.AccessKeys.CurrentFile()
 	if _, fileErr := os.Stat(currentFile); os.IsNotExist(fileErr) {
-		NewAccessKey().Save(currentFile)
-
+		NewAccessKey(&s.AccessKeys).Save()
 	}
 
 	return

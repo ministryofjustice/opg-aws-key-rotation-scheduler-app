@@ -36,31 +36,32 @@ func updateInformationMenu(
 
 	now := time.Now().UTC()
 	at := key.RotateAt(s.RotationFrequency)
-	lockfile := s.AccessKeys.LockFile()
-	current := s.AccessKeys.CurrentFile()
 
 	pp.Printf("[%s] next rotation at [%s]\n", now, at)
 
 	mu.Lock()
-
-	if key.Locked(lockfile) && time.Since(key.LockedAt(lockfile)) > time.Hour {
+	// if the lock file is old, remove it and trigger process
+	if key.Locked() && key.LockIsOld() {
 		pp.Println("Key is locked and too old, so removing...")
-		key.Unlock(lockfile)
-	} else if key.Locked(lockfile) {
+		key.Unlock()
+	}
+
+	if key.Locked() {
 		pp.Println("Key is locked...")
 		info.Label = s.Labels.Locked
 		// add icon change - LOCKED
 		menu.Refresh()
 	} else if now.After(at) {
 		pp.Println("Rotating key...")
-		key.Lock(lockfile)
+		key.Lock()
 		// add icon change - UPDATING
 		info.Label = s.Labels.Rotating
 		menu.Refresh()
 
 		opgapp.RotateCommand(s)
-		key.Unlock(lockfile)
-		key = key.Rotate(current)
+
+		key.Unlock()
+		key = key.Rotate()
 
 		// add icon change - NORMAL
 		at = key.RotateAt(s.RotationFrequency)
@@ -93,7 +94,7 @@ func main() {
 
 	// create the app menus
 	//	- rotate
-	rotate = fyne.NewMenuItem("Rotate", func() {})
+	rotate = fyne.NewMenuItem(settings.Labels.Rotate, func() {})
 	//	- information
 	at := accessKeyTracker.RotateAt(settings.RotationFrequency)
 	information = fyne.NewMenuItem(fmt.Sprintf(settings.Labels.NextRotation, at.Format(settings.DateTimeFormat)), func() {})
@@ -107,8 +108,10 @@ func main() {
 	if supports.Os && supports.Desktop && supports.AwsVault {
 		menu = fyne.NewMenu(settings.Name, rotate, information)
 		desk.SetSystemTrayMenu(menu)
+
 		go func() {
-			for range time.Tick(time.Minute) {
+			dur := time.Minute
+			for range time.Tick(dur) {
 				pp.Println("tick")
 				accessKeyTracker = updateInformationMenu(information, menu, accessKeyTracker, settings, mu)
 			}
@@ -120,5 +123,7 @@ func main() {
 		desk.SetSystemTrayMenu(menu)
 	}
 
+	accessKeyTracker = updateInformationMenu(information, menu, accessKeyTracker, settings, mu)
 	a.Run()
+
 }

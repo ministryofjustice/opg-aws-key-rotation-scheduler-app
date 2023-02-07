@@ -1,7 +1,9 @@
 package opgapp
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -25,5 +27,19 @@ func (akc *AccessKeyConfiguration) CurrentFile() (f string) {
 
 func (akc *AccessKeyConfiguration) LockFile() (f string) {
 	f = fmt.Sprintf("%s/%s", akc.Dir(), akc.LockFilePath)
+	return
+}
+
+func (akc *AccessKeyConfiguration) Lock() (key *AccessKeyTracker) {
+	lockfile := akc.LockFile()
+	content, _ := ioutil.ReadFile(lockfile)
+	json.Unmarshal([]byte(content), &key)
+	return
+}
+
+func (akc *AccessKeyConfiguration) Current() (key *AccessKeyTracker) {
+	lockfile := akc.CurrentFile()
+	content, _ := ioutil.ReadFile(lockfile)
+	json.Unmarshal([]byte(content), &key)
 	return
 }
