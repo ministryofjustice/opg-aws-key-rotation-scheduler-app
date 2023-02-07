@@ -3,6 +3,7 @@ package opgapp
 import (
 	"encoding/json"
 	"io/ioutil"
+	"runtime"
 )
 
 type Settings struct {
@@ -13,6 +14,24 @@ type Settings struct {
 	AwsVault          AwsVaultConfig         `json:"aws_vault"`
 	Labels            Labels                 `json:"labels"`
 	Errors            ErrorMessages          `json:"errors"`
+	Icons             MenuIcons              `json:"icons"`
+	OsData            struct {
+		Darwin OsInfo `json:"darwin"`
+	} `json:"os"`
+}
+
+type OsInfo struct {
+	Shell string `json:"shell"`
+	Theme string `json:"theme"`
+}
+
+// Os returns the specific OS info for this os
+func (s *Settings) Os() (info OsInfo) {
+	switch runtime.GOOS {
+	case "darwin":
+		info = s.OsData.Darwin
+	}
+	return
 }
 
 // ---

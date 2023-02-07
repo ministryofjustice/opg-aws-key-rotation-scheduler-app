@@ -5,7 +5,6 @@ import "os/exec"
 type AwsVaultOsSpecific struct {
 	Command string `json:"command"`
 	Profile string `json:"profile"`
-	Shell   string `json:"shell"`
 	Prompt  string `json:"prompt"`
 }
 
