@@ -17,18 +17,23 @@ const (
 	SettingsFile string = "/settings.json"
 )
 
-// Shard vars between top level funcstions
+// Sharwd vars between top level funcstions
 var (
 	settings         *opgapp.Settings
 	accessKeyTracker *opgapp.AccessKeyTracker
 	supports         opgapp.Supports
 )
 
+// menu / gui items
+var (
+	rotate, information, errorMsg *fyne.MenuItem
+	menu                          *fyne.Menu
+	a                             fyne.App
+)
+
 func main() {
 	mu := &sync.Mutex{}
-	var rotate, information, errorMsg *fyne.MenuItem
-	var menu *fyne.Menu
-	var a fyne.App = app.New()
+	a = app.New()
 
 	settings = opgapp.LoadSettings(project.ROOT_DIR + SettingsFile)
 	// supported checks
