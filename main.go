@@ -41,10 +41,17 @@ func main() {
 
 	// create the app menus
 	//	- rotate
-	rotate = fyne.NewMenuItem(settings.Labels.Rotate, func() {})
+	rotate = fyne.NewMenuItem(settings.Labels.Rotate, func() {
+		mu.Lock()
+		accessKeyTracker = opgapp.MenuRotate(information, rotate, menu, accessKeyTracker, settings)
+		mu.Unlock()
+	})
 	//	- information
 	at := accessKeyTracker.RotateAt(settings.RotationFrequency)
-	information = fyne.NewMenuItem(fmt.Sprintf(settings.Labels.NextRotation, at.Format(settings.DateTimeFormat)), func() {})
+	information = fyne.NewMenuItem(
+		fmt.Sprintf(settings.Labels.NextRotation, at.Format(settings.DateTimeFormat)),
+		func() {},
+	)
 	information.Disabled = true
 	// - error message about app state (missing requirements etc)
 	errorMsg = fyne.NewMenuItem("", func() {})
@@ -53,14 +60,15 @@ func main() {
 	desk, _ := a.(desktop.App)
 	// happy path, all supported
 	if supports.Os && supports.Desktop && supports.AwsVault {
-		menu = fyne.NewMenu(settings.Name, rotate, information)
+		split := fyne.NewMenuItemSeparator()
+		menu = fyne.NewMenu(settings.Name, rotate, split, information)
 		desk.SetSystemTrayMenu(menu)
 
 		go func() {
 			dur := time.Minute
 			for range time.Tick(dur) {
 				pp.Println("tick")
-				accessKeyTracker = opgapp.UpdateMenu(information, menu, accessKeyTracker, settings, mu)
+				accessKeyTracker = opgapp.UpdateMenu(information, rotate, menu, accessKeyTracker, settings, mu)
 			}
 		}()
 	} else if supports.Os && supports.Desktop {
@@ -70,7 +78,7 @@ func main() {
 		desk.SetSystemTrayMenu(menu)
 	}
 
-	accessKeyTracker = opgapp.UpdateMenu(information, menu, accessKeyTracker, settings, mu)
+	accessKeyTracker = opgapp.UpdateMenu(information, rotate, menu, accessKeyTracker, settings, mu)
 	a.Run()
 
 }
