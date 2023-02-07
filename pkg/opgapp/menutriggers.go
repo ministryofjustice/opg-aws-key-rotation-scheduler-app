@@ -71,7 +71,7 @@ func MenuKeyLocked(
 ) {
 	pp.Println("Key is locked...")
 	info.Label = s.Labels.Locked
-	// add icon change - LOCKED
+
 	menu.Refresh()
 }
 
@@ -87,7 +87,6 @@ func MenuRotate(
 
 	pp.Println("Rotating key...")
 	key.Lock()
-	// add icon change - UPDATING
 	info.Label = s.Labels.Rotating
 	rotate.Disabled = true
 	menu.Refresh()
@@ -97,7 +96,7 @@ func MenuRotate(
 	if err == nil {
 		key.Unlock()
 		key = key.Rotate()
-		// add icon change - NORMAL
+
 		at := key.RotateAt(s.RotationFrequency)
 		info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
 		rotate.Disabled = false

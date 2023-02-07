@@ -47,7 +47,7 @@ type ThemeIcons struct {
 }
 
 // Default generates a Resource based on the default file path
-func (ti *ThemeIcons) Default() (r fyne.Resource) {
+func (ti ThemeIcons) Default() (r fyne.Resource) {
 	path := filepath.Join(project.ROOT_DIR, ti.DefaultIcon)
 	content, _ := ioutil.ReadFile(path)
 	r = fyne.NewStaticResource("default-icon", content)
@@ -55,7 +55,7 @@ func (ti *ThemeIcons) Default() (r fyne.Resource) {
 }
 
 // Locked generates a Resource based on the locked file path
-func (ti *ThemeIcons) Locked() (r fyne.Resource) {
+func (ti ThemeIcons) Locked() (r fyne.Resource) {
 	path := filepath.Join(project.ROOT_DIR, ti.LockedIcon)
 	content, _ := ioutil.ReadFile(path)
 	r = fyne.NewStaticResource("locked-icon", content)
@@ -63,7 +63,7 @@ func (ti *ThemeIcons) Locked() (r fyne.Resource) {
 }
 
 // Rotating generates a Resource based on the rotating file path
-func (ti *ThemeIcons) Rotating() (r fyne.Resource) {
+func (ti ThemeIcons) Rotating() (r fyne.Resource) {
 	path := filepath.Join(project.ROOT_DIR, ti.RotatingIcon)
 	content, _ := ioutil.ReadFile(path)
 	r = fyne.NewStaticResource("rotating-icon", content)
