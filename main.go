@@ -24,59 +24,6 @@ var (
 	supports         opgapp.Supports
 )
 
-// mutex lock
-
-func updateInformationMenu(
-	info *fyne.MenuItem,
-	menu *fyne.Menu,
-	key *opgapp.AccessKeyTracker,
-	s *opgapp.Settings,
-	mu *sync.Mutex,
-) *opgapp.AccessKeyTracker {
-
-	now := time.Now().UTC()
-	at := key.RotateAt(s.RotationFrequency)
-
-	pp.Printf("[%s] next rotation at [%s]\n", now, at)
-
-	mu.Lock()
-	// if the lock file is old, remove it and trigger process
-	if key.Locked() && key.LockIsOld() {
-		pp.Println("Key is locked and too old, so removing...")
-		key.Unlock()
-	}
-
-	if key.Locked() {
-		pp.Println("Key is locked...")
-		info.Label = s.Labels.Locked
-		// add icon change - LOCKED
-		menu.Refresh()
-	} else if now.After(at) {
-		pp.Println("Rotating key...")
-		key.Lock()
-		// add icon change - UPDATING
-		info.Label = s.Labels.Rotating
-		menu.Refresh()
-
-		opgapp.RotateCommand(s)
-
-		key.Unlock()
-		key = key.Rotate()
-
-		// add icon change - NORMAL
-		at = key.RotateAt(s.RotationFrequency)
-		info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
-	} else {
-		at = key.RotateAt(s.RotationFrequency)
-		info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
-
-	}
-	menu.Refresh()
-
-	mu.Unlock()
-	return key
-}
-
 func main() {
 	mu := &sync.Mutex{}
 	var rotate, information, errorMsg *fyne.MenuItem
@@ -113,7 +60,7 @@ func main() {
 			dur := time.Minute
 			for range time.Tick(dur) {
 				pp.Println("tick")
-				accessKeyTracker = updateInformationMenu(information, menu, accessKeyTracker, settings, mu)
+				accessKeyTracker = opgapp.UpdateMenu(information, menu, accessKeyTracker, settings, mu)
 			}
 		}()
 	} else if supports.Os && supports.Desktop {
@@ -123,7 +70,7 @@ func main() {
 		desk.SetSystemTrayMenu(menu)
 	}
 
-	accessKeyTracker = updateInformationMenu(information, menu, accessKeyTracker, settings, mu)
+	accessKeyTracker = opgapp.UpdateMenu(information, menu, accessKeyTracker, settings, mu)
 	a.Run()
 
 }
