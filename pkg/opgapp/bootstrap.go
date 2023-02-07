@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-// Bootstrap creates the folder structure and (TODO) plist files
+// Bootstrap creates the folder structure
 func Bootstrap(s *Settings) (err error) {
 
 	// create the storage directory if it doesnt exist

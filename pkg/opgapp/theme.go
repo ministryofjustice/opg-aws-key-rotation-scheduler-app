@@ -12,11 +12,11 @@ import (
 // Defaults to light
 //   - Only supports MacOs
 //   - shell and command to run comes from settings.json
-func OsTheme(s *Settings) (mode string) {
+func OsTheme() (mode string) {
 	mode = "light"
 	switch runtime.GOOS {
 	case "darwin":
-		osInfo := s.Os()
+		osInfo := _os
 		sh, _ := exec.LookPath(osInfo.Shell)
 		output := new(strings.Builder)
 		c := &exec.Cmd{

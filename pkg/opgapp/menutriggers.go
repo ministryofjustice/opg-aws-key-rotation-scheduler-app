@@ -2,107 +2,78 @@ package opgapp
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
-	"fyne.io/fyne/v2"
 	"github.com/k0kubun/pp"
 )
 
 // UpdateMenu is called frequently via a go routine to check the status
 // of access key, trigger gui updates and funcs to update the key
-func UpdateMenu(
-	info *fyne.MenuItem,
-	rotate *fyne.MenuItem,
-	menu *fyne.Menu,
-	key *AccessKeyTracker,
-	s *Settings,
-	mu *sync.Mutex,
-) *AccessKeyTracker {
-
+func UpdateMenu() {
 	now := time.Now().UTC()
-	at := key.RotateAt(s.RotationFrequency)
-
+	at := _track.RotateAt(_rotateFrequency)
 	pp.Printf("[%s] next rotation at [%s]\n", now, at)
 
-	mu.Lock()
-	// if the lock file is old, remove it and trigger process
-	if key.Locked() && key.LockIsOld() {
-		MenuKeyOldLock(info, menu, key, s)
+	_mu.Lock()
+	if _track.Locked() && _track.LockIsOld() {
+		MenuKeyOldLock()
 	}
 
-	if key.Locked() {
-		MenuKeyLocked(info, menu, key, s)
+	if _track.Locked() {
+		MenuKeyLocked()
 	} else if now.After(at) {
-		key = MenuRotate(info, rotate, menu, key, s)
+		MenuRotate()
 	} else {
-		at = key.RotateAt(s.RotationFrequency)
-		info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
-
+		_menuInformation.Label = fmt.Sprintf(
+			_labels.NextRotation,
+			_track.RotateAt(_rotateFrequency).Format(_settings.DateTimeFormat),
+		)
 	}
-	rotate.Disabled = false
-	menu.Refresh()
 
-	mu.Unlock()
-	return key
+	_mu.Unlock()
 }
 
 // MenuKeyOldLock deals with a lock file that is aged, so presume
 // that the rotate failed or was cancelled and therefore
 // cleanup the file and carry on
-func MenuKeyOldLock(
-	info *fyne.MenuItem,
-	menu *fyne.Menu,
-	key *AccessKeyTracker,
-	s *Settings,
-) {
+func MenuKeyOldLock() {
 	pp.Println("Key is locked and too old, so removing...")
-	key.Unlock()
+	_track.Unlock()
 }
 
 // MenuKeyLocked updates gui to show that there is a
 // lock file present on the filesystem and there presume
 // a rotate is in progress
-func MenuKeyLocked(
-	info *fyne.MenuItem,
-	menu *fyne.Menu,
-	key *AccessKeyTracker,
-	s *Settings,
-) {
+func MenuKeyLocked() {
 	pp.Println("Key is locked...")
-	info.Label = s.Labels.Locked
-
-	menu.Refresh()
+	_menuInformation.Label = _labels.Locked
+	_menu.Refresh()
 }
 
 // MenuRotate handles the gui changes and func calls to change
 // a key and show the status of that change
-func MenuRotate(
-	info *fyne.MenuItem,
-	rotate *fyne.MenuItem,
-	menu *fyne.Menu,
-	key *AccessKeyTracker,
-	s *Settings,
-) *AccessKeyTracker {
-
+func MenuRotate() {
 	pp.Println("Rotating key...")
-	key.Lock()
-	info.Label = s.Labels.Rotating
-	rotate.Disabled = true
-	menu.Refresh()
+	_track.Lock()
 
-	err := RotateCommand(s)
-	// only rotate when there are no errors
+	_menuInformation.Label = _labels.Rotating
+	_menuRotate.Disabled = true
+	_menu.Refresh()
+
+	err := RotateCommand(_settings)
 	if err == nil {
-		key.Unlock()
-		key = key.Rotate()
+		_track.Unlock()
+		_track = _track.Rotate()
 
-		at := key.RotateAt(s.RotationFrequency)
-		info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
-		rotate.Disabled = false
+		_menuInformation.Label = fmt.Sprintf(
+			_labels.NextRotation,
+			_track.RotateAt(_rotateFrequency).Format(_settings.DateTimeFormat),
+		)
+		_menuRotate.Disabled = false
+
 	} else {
-		MenuKeyLocked(info, menu, key, s)
+		MenuKeyLocked()
 	}
-	menu.Refresh()
-	return key
+	_menu.Refresh()
+
 }

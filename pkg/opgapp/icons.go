@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"fyne.io/fyne/v2"
-	"github.com/k0kubun/pp"
 )
 
 // MenuItems are loaded from the settings file and
@@ -31,9 +30,7 @@ type MenuIcon struct {
 // Defaults to icons suitable for light themes (black images)
 func (m *MenuIcons) Themed(s *Settings) (icons ThemeIcons) {
 	icons = ThemeIcons{DefaultIcon: m.Default.Black, LockedIcon: m.Locked.Black, RotatingIcon: m.Rotating.Black}
-	mode := OsTheme(s)
-	pp.Println(mode)
-	if OsTheme(s) == "dark" {
+	if OsTheme() == "dark" {
 		icons = ThemeIcons{DefaultIcon: m.Default.White, LockedIcon: m.Locked.White, RotatingIcon: m.Rotating.White}
 	}
 	return

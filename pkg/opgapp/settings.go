@@ -21,15 +21,17 @@ type Settings struct {
 }
 
 type OsInfo struct {
-	Shell string `json:"shell"`
-	Theme string `json:"theme"`
+	Shell       string `json:"shell"`
+	Theme       string `json:"theme"`
+	LoadProfile string `json:"load_profile"`
+	Which       string `json:"which"`
 }
 
 // Os returns the specific OS info for this os
-func (s *Settings) Os() (info OsInfo) {
+func (s *Settings) Os() (info *OsInfo) {
 	switch runtime.GOOS {
 	case "darwin":
-		info = s.OsData.Darwin
+		info = &s.OsData.Darwin
 	}
 	return
 }

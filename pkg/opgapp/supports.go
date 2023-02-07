@@ -15,15 +15,15 @@ type Supports struct {
 func IsSupported(
 	settings *Settings,
 	app fyne.App,
-) (s Supports) {
-	s = Supports{Os: false, AwsVault: false, Desktop: false}
+) (s *Supports) {
+	s = &Supports{Os: false, AwsVault: false, Desktop: false}
 
 	spec := settings.AwsVault.OsSpecific()
 	// os is supported if a profile is returned from aws vault config
 	// then see if vault is installed
 	if len(spec.Command) > 0 {
 		s.Os = true
-		s.AwsVault = spec.Installed()
+		s.AwsVault = spec.Installed(settings)
 	}
 	// check desktop
 	_, desktop := app.(desktop.App)
