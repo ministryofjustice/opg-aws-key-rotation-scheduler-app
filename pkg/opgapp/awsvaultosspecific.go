@@ -1,19 +1,18 @@
 package opgapp
 
-import "os/exec"
-
 type AwsVaultOsSpecific struct {
 	Command string `json:"command"`
 	Profile string `json:"profile"`
 	Prompt  string `json:"prompt"`
 }
 
-func (avos *AwsVaultOsSpecific) Installed() (installed bool) {
+func (avos *AwsVaultOsSpecific) Installed(settings *Settings) (installed bool) {
 	installed = false
 
-	if _, err := exec.LookPath(avos.Command); err == nil {
+	if _, err := LookupWithEnv(avos.Command, settings); err == nil {
 		installed = true
 	}
+
 	return
 
 }
