@@ -35,10 +35,9 @@ func main() {
 	mu := &sync.Mutex{}
 	a = app.New()
 
-	settings = opgapp.LoadSettings(project.ROOT_DIR + SettingsFile)
+	settings = opgapp.LoadSettings(filepath.Join(project.ROOT_DIR, SettingsFile))
 	// supported checks
 	supports = opgapp.IsSupported(settings, a)
-
 	// create base files and structure for the app
 	opgapp.Bootstrap(settings)
 	// fetch last key data

@@ -2,9 +2,9 @@ package opgapp
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -21,12 +21,12 @@ func (akc *AccessKeyConfiguration) Dir() (path string) {
 }
 
 func (akc *AccessKeyConfiguration) CurrentFile() (f string) {
-	f = fmt.Sprintf("%s/%s", akc.Dir(), akc.CurrentFilePath)
+	f = filepath.Join(akc.Dir(), akc.CurrentFilePath)
 	return
 }
 
 func (akc *AccessKeyConfiguration) LockFile() (f string) {
-	f = fmt.Sprintf("%s/%s", akc.Dir(), akc.LockFilePath)
+	f = filepath.Join(akc.Dir(), akc.LockFilePath)
 	return
 }
 

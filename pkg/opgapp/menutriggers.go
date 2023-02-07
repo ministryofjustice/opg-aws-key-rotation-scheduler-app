@@ -102,7 +102,6 @@ func MenuRotate(
 		info.Label = fmt.Sprintf(s.Labels.NextRotation, at.Format(s.DateTimeFormat))
 		rotate.Disabled = false
 	} else {
-
 		MenuKeyLocked(info, menu, key, s)
 	}
 	menu.Refresh()
