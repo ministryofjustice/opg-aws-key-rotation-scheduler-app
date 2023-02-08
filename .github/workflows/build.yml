@@ -40,6 +40,14 @@ jobs:
         fyne --version
         which bash
         echo "gobin: ${GOBIN}"
-        ls -lart
         cd -
+    - name: Run makefile
+      run: |
+        cd ../
+        gbin=$(pwd)/gobin
+        export GOBIN="${gbin}"
+        export PATH="${PATH}:${GOBIN}"
+        cd -
+        make all
+        ls -lart
       
