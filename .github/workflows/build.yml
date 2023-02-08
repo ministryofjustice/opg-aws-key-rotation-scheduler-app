@@ -12,8 +12,8 @@ defaults:
     shell: bash
 
 jobs:
-  run_make:
-    name: "Run Makefile"
+  build_from_makefile:
+    name: "Building"
     runs-on: ubuntu-latest
     steps:
     - name: Checkout reporting repo
@@ -25,7 +25,7 @@ jobs:
         go-version: '1.19'
     - name: Install fyne
       run: |
-        export GOBIN="./.gobin/"
+        export GOBIN="${pwd}/.gobin/"
         go install fyne.io/fyne/v2/cmd/fyne@latest
     - name: Check versions and vars
       run: |
