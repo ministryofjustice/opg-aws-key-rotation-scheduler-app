@@ -23,7 +23,7 @@ jobs:
         go-version: '1.19'
     - name: Setup GOPATH and GOBIN
       run: |
-        export GOBIN="${GITHUB_WORKSPACE}/gobin"
+        export GOBIN="${HOME}/gobin"
         echo "GOBIN=${GOBIN}" >> $GITHUB_ENV
     - run: go env
     - run: echo "gopath ${GOPATH}"
