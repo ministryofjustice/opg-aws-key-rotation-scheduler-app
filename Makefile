@@ -2,7 +2,7 @@ SHELL := $(shell which bash)
 APPNAME := OPG AWS Key Rotation
 
 OS := $(shell uname | tr '[:upper:]' '[:lower:]')
-ARCH := $(shell arch)
+ARCH := $(shell uname -m)
 
 BUILD_FOLDER = ./builds/
 OS_AND_ARCHS_TO_BUILD := darwin_arm64 darwin_amd64
