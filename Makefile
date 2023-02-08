@@ -4,13 +4,10 @@ APPNAME := OPG AWS Key Rotation
 OS := $(shell uname | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m)
 
-BUILD_FOLDER = ./builds/
-#OS_AND_ARCHS_TO_BUILD := darwin_arm64 darwin_amd64
-OS_AND_ARCHS_TO_BUILD := darwin_arm64
-HOST_ARCH := ${OS}_${ARCH}
+BUILD_FOLDER = ./fyne-cross/
 
-PLIST := ./'${APPNAME}.app'/Contents/Info.plist
-PLIST_TEMP := ./plist.tmp
+# PLIST := ./'${APPNAME}.app'/Contents/Info.plist
+# PLIST_TEMP := ./plist.tmp
 
 .DEFAULT_GOAL: self
 .PHONY: self all requirements build plist-fix
@@ -18,35 +15,32 @@ PLIST_TEMP := ./plist.tmp
 .EXPORT_ALL_VARIABLES:
 
 
-self: $(HOST_ARCH)
-	
-all: requirements $(OS_AND_ARCHS_TO_BUILD)
-	
+self: requirements
+	fyne-cross $(OS) -arch=$(ARCH) --name "${APPNAME}" --icon="./icons/main.png" 
+	@cat $(BUILD_FOLDER)/dist/$(OS)-$(ARCH)/'$(APPNAME).app'/Contents/Info.plist | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > $(OS)-$(ARCH).plist
+	@mv $(OS)-$(ARCH).plist $(BUILD_FOLDER)/dist/$(OS)-$(ARCH)/'$(APPNAME).app'/Contents/Info.plist
 
-darwin_arm64:
-	@mkdir -p $(BUILD_FOLDER)$@/
-	@env GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go	
-	@cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
-	@cd ${BUILD_FOLDER}$@/ && cat ${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > ${PLIST_TEMP}
-	@echo Build $@ complete.
-
-darwin_amd64: 
-	@mkdir -p $(BUILD_FOLDER)$@/
-	@env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go 2>/dev/null
-	@cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
-	@cd ${BUILD_FOLDER}$@/ && cat ${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > ${PLIST_TEMP}
-	@echo Build $@ complete.
+all: requirements 
+	fyne-cross darwin -arch=amd64,arm64 --name "${APPNAME}" --icon="./icons/main.png" 
+	@cat $(BUILD_FOLDER)/dist/darwin-arm64/'$(APPNAME).app'/Contents/Info.plist | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > darwin-arm64.plist
+	@mv darwin-arm64.plist $(BUILD_FOLDER)/dist/darwin-arm64/'$(APPNAME).app'/Contents/Info.plist
+	@cat $(BUILD_FOLDER)/dist/darwin-amd64/'$(APPNAME).app'/Contents/Info.plist | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > darwin-amd64.plist
+	@mv darwin-amd64.plist $(BUILD_FOLDER)/dist/darwin-amd64/'$(APPNAME).app'/Contents/Info.plist
+	
 	
 requirements:
-	rm -Rf ${BUILD_FOLDER}
-# ifeq (, $(shell which go))
-# 	$(error go command not found)
-# endif
-# ifndef GOBIN
-# 	$(error GOBIN is not defined)
-# endif
-# ifeq (, $(shell which fyne))
-# 	$(error fyne command not found, check https://developer.fyne.io/started/packaging)	
-# endif
-# 	@echo All requirements checked
-# 	@rm -Rf ${BUILD_FOLDER}
+ifeq (, $(shell which go))
+	$(error go command not found)
+endif
+ifndef GOBIN
+	$(error GOBIN is not defined)
+endif
+ifeq (, $(shell which fyne))
+	$(error fyne command not found, check https://developer.fyne.io/started/packaging)	
+endif
+ifeq (, $(shell which fyne-cross))
+	$(error fyne-cross command not found, check https://developer.fyne.io/started/cross-compiling)	
+endif
+	@rm -Rf ${BUILD_FOLDER}
+	@echo All requirements checked
+	
