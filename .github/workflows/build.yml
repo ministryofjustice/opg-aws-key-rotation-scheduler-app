@@ -38,8 +38,6 @@ jobs:
     - run: fyne version
     - name: Checkout Repo
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
     - run: make ${{ matrix.target_architecture }}
     - run:  ls -lart ./builds/${{ matrix.target_architecture }}/**/
 
