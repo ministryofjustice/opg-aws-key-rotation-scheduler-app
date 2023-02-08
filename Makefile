@@ -12,12 +12,12 @@ PLIST := ./'${APPNAME}.app'/Contents/Info.plist
 PLIST_TEMP := ./plist.tmp
 
 .DEFAULT_GOAL: self
-.PHONY: self all requirements build plist-fix
+.PHONY: self all requirements darwin_arm64 darwin_amd64
 .ONESHELL:
 .EXPORT_ALL_VARIABLES:
 
 
-self: $(HOST_ARCH)
+self: requirements $(HOST_ARCH)
 	
 all: requirements $(OS_AND_ARCHS_TO_BUILD)
 
