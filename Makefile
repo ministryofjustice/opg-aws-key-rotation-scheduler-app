@@ -23,12 +23,14 @@ all: requirements $(OS_AND_ARCHS_TO_BUILD)
 	
 
 darwin_arm64:
+	@mkdir -p $(BUILD_FOLDER)$@/
 	@env GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go	
 	@cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
 	@cd ${BUILD_FOLDER}$@/ && cat ${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > ${PLIST_TEMP}
 	@echo Build $@ complete.
 
 darwin_amd64: 
+	@mkdir -p $(BUILD_FOLDER)$@/
 	@env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go 2>/dev/null
 	@cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
 	@cd ${BUILD_FOLDER}$@/ && cat ${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > ${PLIST_TEMP}
