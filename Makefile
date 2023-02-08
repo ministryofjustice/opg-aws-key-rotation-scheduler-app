@@ -4,10 +4,12 @@ APPNAME := OPG AWS Key Rotation
 OS := $(shell uname | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m)
 
-BUILD_FOLDER = ./fyne-cross/
+BUILD_FOLDER = ./builds/
+OS_AND_ARCHS_TO_BUILD := darwin_arm64 darwin_amd64
+HOST_ARCH := ${OS}_${ARCH}
 
-# PLIST := ./'${APPNAME}.app'/Contents/Info.plist
-# PLIST_TEMP := ./plist.tmp
+PLIST := ./'${APPNAME}.app'/Contents/Info.plist
+PLIST_TEMP := ./plist.tmp
 
 .DEFAULT_GOAL: self
 .PHONY: self all requirements build plist-fix
@@ -15,18 +17,26 @@ BUILD_FOLDER = ./fyne-cross/
 .EXPORT_ALL_VARIABLES:
 
 
-self: requirements
-	fyne-cross $(OS) -arch=$(ARCH) --name "${APPNAME}" --icon="./icons/main.png" 
-	@cat $(BUILD_FOLDER)/dist/$(OS)-$(ARCH)/'$(APPNAME).app'/Contents/Info.plist | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > $(OS)-$(ARCH).plist
-	@mv $(OS)-$(ARCH).plist $(BUILD_FOLDER)/dist/$(OS)-$(ARCH)/'$(APPNAME).app'/Contents/Info.plist
-
-all: requirements 
-	fyne-cross darwin -arch=amd64,arm64 --name "${APPNAME}" --icon="./icons/main.png" 
-	@cat $(BUILD_FOLDER)/dist/darwin-arm64/'$(APPNAME).app'/Contents/Info.plist | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > darwin-arm64.plist
-	@mv darwin-arm64.plist $(BUILD_FOLDER)/dist/darwin-arm64/'$(APPNAME).app'/Contents/Info.plist
-	@cat $(BUILD_FOLDER)/dist/darwin-amd64/'$(APPNAME).app'/Contents/Info.plist | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > darwin-amd64.plist
-	@mv darwin-amd64.plist $(BUILD_FOLDER)/dist/darwin-amd64/'$(APPNAME).app'/Contents/Info.plist
+self: $(HOST_ARCH)
 	
+all: requirements $(OS_AND_ARCHS_TO_BUILD)
+
+
+darwin_arm64:
+	@mkdir -p $(BUILD_FOLDER)$@/
+	@env GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go 2>/dev/null
+	@cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
+	@cat $(BUILD_FOLDER)$@/${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > $(BUILD_FOLDER)$@/${PLIST_TEMP}
+	@mv $(BUILD_FOLDER)$@/${PLIST_TEMP} $(BUILD_FOLDER)$@/${PLIST}
+	@echo Build $@ complete.
+
+darwin_amd64: 
+	@mkdir -p $(BUILD_FOLDER)$@/
+	@env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go 2>/dev/null
+	@cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
+	@cat $(BUILD_FOLDER)$@/${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > $(BUILD_FOLDER)$@/${PLIST_TEMP}
+	@mv $(BUILD_FOLDER)$@/${PLIST_TEMP} $(BUILD_FOLDER)$@/${PLIST}
+	@echo Build $@ complete.
 	
 requirements:
 ifeq (, $(shell which go))
@@ -38,9 +48,5 @@ endif
 ifeq (, $(shell which fyne))
 	$(error fyne command not found, check https://developer.fyne.io/started/packaging)	
 endif
-ifeq (, $(shell which fyne-cross))
-	$(error fyne-cross command not found, check https://developer.fyne.io/started/cross-compiling)	
-endif
-	@rm -Rf ${BUILD_FOLDER}
 	@echo All requirements checked
-	
+	@rm -Rf ${BUILD_FOLDER}
