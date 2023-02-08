@@ -1,0 +1,44 @@
+{       
+    "name": "OPG AWS Key Rotation",  
+    "date_time_format": "02-Jan-2006 15:04",  
+    "rotation_frequency": "24h",    
+    "access_keys": {
+        "directory": "~/.opg/aws-key-rotation",
+        "current_access_key": "current.v0",
+        "lock_file": "locked.v0"
+    },
+    "aws_vault": {
+        "darwin" : {
+            "command": "aws-vault",        
+            "profile": "identity",
+            "prompt": "osascript"      
+        }
+    },    
+    "labels": {
+        "next_rotation": "Next rotation at: %s",
+        "rotating": "Rotating...",
+        "rotate": "Rotate Now",
+        "locked": "Locked"
+    },
+    "errors": {
+        "aws_vault_not_found": "AWS Vault not found",
+        "not_desktop": "Not a desktop Os",
+        "unsupported_os": "OS is not supported"
+    },
+    "icons": {
+       
+        "default": {
+            "black": "/static/icons/menu.black.png",
+            "white": "/static/icons/menu.white.png"
+        }
+    },
+    "os": {
+        "darwin": {
+            "shell": "zsh",
+            "load_profile": "source ~/.zprofile",
+            "which": "which",
+            "theme" : "defaults read -g AppleInterfaceStyle"
+        }
+    }
+    
+}
