@@ -38,4 +38,5 @@ jobs:
         fyne --version
         which bash
         echo "gobin: ${GOBIN}"
+        ls -lart
       
