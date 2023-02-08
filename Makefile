@@ -19,22 +19,23 @@ PLIST_TEMP := ./plist.tmp
 
 self: $(HOST_ARCH)
 	
-all: $(OS_AND_ARCHS_TO_BUILD)
+all: requirements $(OS_AND_ARCHS_TO_BUILD)
 	
 
-darwin_arm64: requirements
+darwin_arm64:
 	@env GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go	
 	@cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
 	@cd ${BUILD_FOLDER}$@/ && cat ${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > ${PLIST_TEMP}
 	@echo Build $@ complete.
 
-darwin_amd64: requirements
+darwin_amd64: 
 	@env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go 2>/dev/null
 	@cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
 	@cd ${BUILD_FOLDER}$@/ && cat ${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > ${PLIST_TEMP}
 	@echo Build $@ complete.
 	
 requirements:
+	rm -Rf ${BUILD_FOLDER}
 # ifeq (, $(shell which go))
 # 	$(error go command not found)
 # endif
@@ -44,5 +45,5 @@ requirements:
 # ifeq (, $(shell which fyne))
 # 	$(error fyne command not found, check https://developer.fyne.io/started/packaging)	
 # endif
-	@echo All requirements checked
-	@rm -Rf ${BUILD_FOLDER}
+# 	@echo All requirements checked
+# 	@rm -Rf ${BUILD_FOLDER}
