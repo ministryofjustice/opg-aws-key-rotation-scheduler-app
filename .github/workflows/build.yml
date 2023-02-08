@@ -21,7 +21,8 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: '1.19'
-    - name: Setup GOPATH and GOBIN
+    - run: go version
+    - name: Setup $GOBIN
       run: |
         export GOBIN="${HOME}/gobin"
         mkdir -p ${GOBIN}
@@ -34,7 +35,8 @@ jobs:
       with:
         fetch-depth: 0
     - name: Install fyne
-      run: |
-        go install fyne.io/fyne/v2/cmd/fyne@latest
+      run: go install fyne.io/fyne/v2/cmd/fyne@latest
+    - run: fyne version
+        
 
       
