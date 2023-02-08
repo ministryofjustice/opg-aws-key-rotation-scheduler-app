@@ -11,43 +11,18 @@ defaults:
   run:
     shell: bash
 
+
+
 jobs:
   build_from_makefile:
+    env:
+      GOBIN: "${{env.GITHUB_ACTION_PATH}}/gobin"
     name: "Building"
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout reporting repo
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - uses: actions/setup-go@v3
-      with:
-        go-version: '1.19'
-    - name: Install fyne
-      run: |
-        cd ../
-        gbin=$(pwd)/gobin
-        mkdir -p ${gbin}
-        export GOBIN="${gbin}"
-        go install fyne.io/fyne/v2/cmd/fyne@latest
-    - name: Check env setup
-      run: |
-        cd ../
-        gbin=$(pwd)/gobin
-        export GOBIN="${gbin}"
-        export PATH="${PATH}:${GOBIN}"
-        go version
-        fyne --version
-        which bash
-        echo "gobin: ${GOBIN}"
-        cd -
-    - name: Run makefile
-      run: |
-        cd ../
-        gbin=$(pwd)/gobin
-        export GOBIN="${gbin}"
-        export PATH="${PATH}:${GOBIN}"
-        cd -
-        make all
-        ls -lart
+      - name: Test paths
+        run: |
+          echo "gobin: ${GOBIN}"
+          echo "bash: $(which bash)"
+
       
