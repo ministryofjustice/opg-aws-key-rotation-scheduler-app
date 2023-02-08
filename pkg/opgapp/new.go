@@ -29,6 +29,7 @@ var (
 
 var (
 	_app             fyne.App
+	_desk            desktop.App
 	_menuInformation *fyne.MenuItem
 	_menuRotate      *fyne.MenuItem
 	_menu            *fyne.Menu
@@ -61,9 +62,10 @@ func New(
 		SetupErrorMenu(_errors.AwsVaultNotFoundError)
 	}
 
-	desk, _ := _app.(desktop.App)
-	desk.SetSystemTrayMenu(_menu)
-	_app.SetIcon(_icons.Default())
+	_desk, _ = _app.(desktop.App)
+	_desk.SetSystemTrayMenu(_menu)
+	_desk.SetSystemTrayIcon(_icons.Default())
+	//_app.SetIcon(_icons.Default())
 	UpdateMenu()
 	// this is force a lifecycle policy to hide dock icons
 	// and works with the plist-fix build target
@@ -74,7 +76,6 @@ func New(
 			setActivationPolicy()
 		}()
 	})
-
 	_app.Run()
 
 }

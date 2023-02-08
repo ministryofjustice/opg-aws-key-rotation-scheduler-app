@@ -44,7 +44,9 @@ func MenuKeyOldLock() {
 // a rotate is in progress
 func MenuKeyLocked() {
 	fmt.Println("Key is locked...")
+	_menuRotate.Disabled = false
 	_menuInformation.Label = _labels.Locked
+	_desk.SetSystemTrayIcon(_icons.Locked())
 	_menu.Refresh()
 }
 
@@ -54,11 +56,13 @@ func MenuRotate() {
 	fmt.Println("Rotating key...")
 	_track.Lock()
 
+	_desk.SetSystemTrayIcon(_icons.Rotating())
 	_menuInformation.Label = _labels.Rotating
 	_menuRotate.Disabled = true
 	_menu.Refresh()
 
 	err := RotateCommand(_settings)
+
 	if err == nil {
 		_track.Unlock()
 		_track = _track.Rotate()
@@ -68,6 +72,7 @@ func MenuRotate() {
 			_track.RotateAt(_rotateFrequency).Format(_settings.DateTimeFormat),
 		)
 		_menuRotate.Disabled = false
+		_desk.SetSystemTrayIcon(_icons.Default())
 
 	} else {
 		MenuKeyLocked()
