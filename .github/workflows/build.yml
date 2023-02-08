@@ -39,7 +39,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v3
     - run: make ${{ matrix.target_architecture }}
-    - run:  ls -lart ./builds/${{ matrix.target_architecture }}/**/Contents/MacOS
+    - run: ls -larth ./builds/${{ matrix.target_architecture }}/**/Contents/MacOS
 
         
 
