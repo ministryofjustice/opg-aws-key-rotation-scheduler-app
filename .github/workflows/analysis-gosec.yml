@@ -2,8 +2,10 @@ name: "[Analysis - SAST] Gosec"
 on:
   push:
     branches: [main]
+    paths: ["**.go"]
   pull_request:
     branches: [main]
+    paths: ["**.go"]
 
 jobs:
   test:
