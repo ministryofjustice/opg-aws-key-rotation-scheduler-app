@@ -6,6 +6,10 @@ on:
     branches: [ main ]
     paths: ["**.go"]
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   run_make:
     runs-on: ubuntu-latest
