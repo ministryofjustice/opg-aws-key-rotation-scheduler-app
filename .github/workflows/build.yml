@@ -22,11 +22,12 @@ jobs:
       with:
         go-version: '1.19'
     - run: go version
-    - name: Setup $GOBIN
+    - name: Setup $GOBIN and $PATH
       run: |
         export GOBIN="${HOME}/gobin"
         mkdir -p ${GOBIN}
         echo "GOBIN=${GOBIN}" >> $GITHUB_ENV
+        echo "PATH=${PATH}:${GOBIN}" >> $GITHUB_ENV
     - run: go env
     - run: echo "gobin ${GOBIN}"
     - run: echo "bash $(which bash)"
@@ -35,7 +36,6 @@ jobs:
       with:
         fetch-depth: 0
     - run: go install fyne.io/fyne/v2/cmd/fyne@v2.3.0
-    - run: ls -lart ${GOBIN}/
     - run: fyne version
         
 
