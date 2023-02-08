@@ -4,6 +4,7 @@ import (
 	"opg-aws-key-rotation-scheduler-app/internal/project"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -36,7 +37,7 @@ func New(
 	settingsFile string,
 ) {
 	_mu = &sync.Mutex{}
-	_app = app.NewWithID("opg-aws-key-rotation")
+	_app = app.New()
 
 	_settings = LoadSettings(filepath.Join(project.ROOT_DIR, settingsFile))
 	_rotateFrequency = _settings.RotationFrequency
@@ -62,6 +63,16 @@ func New(
 	desk.SetSystemTrayMenu(_menu)
 	_app.SetIcon(_icons.Default())
 	UpdateMenu()
+	// this is force a lifecycle policy to hide dock icons
+	// and works with the plist-fix build target
+	//	- https://github.com/fyne-io/fyne/issues/3156#issuecomment-1295732800
+	_app.Lifecycle().SetOnStarted(func() {
+		go func() {
+			time.Sleep(200 * time.Millisecond)
+			setActivationPolicy()
+		}()
+	})
+
 	_app.Run()
 
 }
