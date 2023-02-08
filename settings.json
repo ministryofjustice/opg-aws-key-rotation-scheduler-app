@@ -1,7 +1,7 @@
 {       
     "name": "OPG AWS Key Rotation",  
     "date_time_format": "02-Jan-2006 15:04",  
-    "rotation_frequency": "24h",    
+    "rotation_frequency": "15m",    
     "access_keys": {
         "directory": "~/.opg/aws-key-rotation",
         "current_access_key": "current.v0",
