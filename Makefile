@@ -5,7 +5,8 @@ OS := $(shell uname | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m)
 
 BUILD_FOLDER = ./builds/
-OS_AND_ARCHS_TO_BUILD := darwin_arm64 darwin_amd64
+#OS_AND_ARCHS_TO_BUILD := darwin_arm64 darwin_amd64
+OS_AND_ARCHS_TO_BUILD := darwin_arm64
 HOST_ARCH := ${OS}_${ARCH}
 
 PLIST := ./'${APPNAME}.app'/Contents/Info.plist

@@ -38,6 +38,7 @@ jobs:
       with:
         fetch-depth: 0
     - run: make all
+    - run: ls -lart && ls -lart ./builds/
 
         
 
