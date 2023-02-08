@@ -17,12 +17,12 @@ PLIST_TEMP := ./plist.tmp
 .EXPORT_ALL_VARIABLES:
 
 
-self: requirements $(HOST_ARCH)
+self: $(HOST_ARCH)
 	
-all: requirements $(OS_AND_ARCHS_TO_BUILD)
+all: $(OS_AND_ARCHS_TO_BUILD)
 
 
-darwin_arm64:
+darwin_arm64: requirements
 	@mkdir -p $(BUILD_FOLDER)$@/
 	@env GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go 2>/dev/null
 	@cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
@@ -30,7 +30,7 @@ darwin_arm64:
 	@mv $(BUILD_FOLDER)$@/${PLIST_TEMP} $(BUILD_FOLDER)$@/${PLIST}
 	@echo Build $@ complete.
 
-darwin_amd64: 
+darwin_amd64: requirements
 	@mkdir -p $(BUILD_FOLDER)$@/
 	@env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go 2>/dev/null
 	@cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
