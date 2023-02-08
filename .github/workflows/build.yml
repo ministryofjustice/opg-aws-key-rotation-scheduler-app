@@ -25,12 +25,14 @@ jobs:
         go-version: '1.19'
     - name: Install fyne
       run: |
+        cd ../
         gbin=$(pwd)/gobin
         mkdir -p ${gbin}
         export GOBIN="${gbin}"
         go install fyne.io/fyne/v2/cmd/fyne@latest
     - name: Check env setup
       run: |
+        cd ../
         gbin=$(pwd)/gobin
         export GOBIN="${gbin}"
         export PATH="${PATH}:${GOBIN}"
@@ -39,4 +41,5 @@ jobs:
         which bash
         echo "gobin: ${GOBIN}"
         ls -lart
+        cd -
       
