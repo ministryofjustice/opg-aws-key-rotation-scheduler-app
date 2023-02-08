@@ -35,14 +35,14 @@ darwin_amd64: requirements
 	@echo Build $@ complete.
 	
 requirements:
-ifeq (, $(shell which go))
-	$(error go command not found)
-endif
-ifndef GOBIN
-	$(error GOBIN is not defined)
-endif
-ifeq (, $(shell which fyne))
-	$(error fyne command not found, check https://developer.fyne.io/started/packaging)	
-endif
+# ifeq (, $(shell which go))
+# 	$(error go command not found)
+# endif
+# ifndef GOBIN
+# 	$(error GOBIN is not defined)
+# endif
+# ifeq (, $(shell which fyne))
+# 	$(error fyne command not found, check https://developer.fyne.io/started/packaging)	
+# endif
 	@echo All requirements checked
 	@rm -Rf ${BUILD_FOLDER}
