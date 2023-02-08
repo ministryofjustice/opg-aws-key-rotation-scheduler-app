@@ -1,7 +1,7 @@
 {       
     "name": "OPG AWS Key Rotation",  
     "date_time_format": "02-Jan-2006 15:04",  
-    "rotation_frequency": "15m",    
+    "rotation_frequency": "60m",    
     "access_keys": {
         "directory": "~/.opg/aws-key-rotation",
         "current_access_key": "current.v0",
@@ -28,9 +28,18 @@
     "icons": {
        
         "default": {
-            "black": "/static/icons/menu.black.png",
-            "white": "/static/icons/menu.white.png"
+            "black": "/icons/menu.black.png",
+            "white": "/icons/menu.white.png"
+        },
+        "rotating": {
+            "black": "/icons/rotating.png",
+            "white": "/icons/rotating.png"
+        },
+        "locked": {
+            "black": "/icons/locked.png",
+            "white": "/icons/locked.png"
         }
+        
     },
     "os": {
         "darwin": {
