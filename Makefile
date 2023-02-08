@@ -4,7 +4,7 @@ PLIST := ./'${APPNAME}.app'/Contents/Info.plist
 PLISTTEMP := ./plist.tmp
 BUILD_FOLDER = ./builds/
 
-.PHONY: all requirements build app plist-fix
+.PHONY: all requirements build plist-fix
 
 all:
 	@${MAKE} requirements
