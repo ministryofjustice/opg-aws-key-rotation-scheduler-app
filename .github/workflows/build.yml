@@ -24,10 +24,17 @@ jobs:
     - name: Setup GOPATH and GOBIN
       run: |
         export GOBIN="${HOME}/gobin"
+        mkdir -p ${GOBIN}
         echo "GOBIN=${GOBIN}" >> $GITHUB_ENV
     - run: go env
-    - run: echo "gopath ${GOPATH}"
     - run: echo "gobin ${GOBIN}"
     - run: echo "bash $(which bash)"
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Install fyne
+      run: |
+        go install fyne.io/fyne/v2/cmd/fyne@latest
 
       
