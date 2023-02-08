@@ -13,6 +13,7 @@ defaults:
 
 jobs:
   run_make:
+    name: "Run Makefile"
     runs-on: ubuntu-latest
     steps:
     - name: Checkout reporting repo

@@ -1,4 +1,3 @@
-SHELL := '/bin/bash'
 APPNAME := OPG AWS Key Rotation
 
 OS := $(shell uname | tr '[:upper:]' '[:lower:]')
