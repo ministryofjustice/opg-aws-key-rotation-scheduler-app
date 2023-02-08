@@ -24,7 +24,7 @@ jobs:
     - run: go version
     - name: Setup $GOBIN and $PATH
       run: |
-        export GOBIN="${HOME}/gobin"
+        export GOBIN="${HOME}/go/bin"
         mkdir -p ${GOBIN}
         echo "GOBIN=${GOBIN}" >> $GITHUB_ENV
         echo "PATH=${PATH}:${GOBIN}" >> $GITHUB_ENV
@@ -38,7 +38,7 @@ jobs:
       with:
         fetch-depth: 0
     - run: make all
-    - run: ls -lart && ls -lart ./fyne-cross/
+    - run: ls -lart && ls -lart ./builds/ && ls -lart ./builds/darwin_arm64/
 
         
 
