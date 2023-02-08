@@ -31,12 +31,14 @@ jobs:
     - run: go env
     - run: echo "gobin ${GOBIN}"
     - run: echo "bash $(which bash)"
+    - run: go install fyne.io/fyne/v2/cmd/fyne@v2.3.0
+    - run: fyne version
     - name: Checkout Repo
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - run: go install fyne.io/fyne/v2/cmd/fyne@v2.3.0
-    - run: fyne version
+    - run: make all
+
         
 
       
