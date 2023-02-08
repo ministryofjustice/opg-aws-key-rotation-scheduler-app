@@ -25,14 +25,17 @@ jobs:
         go-version: '1.19'
     - name: Install fyne
       run: |
-        gbin=$(pwd)/.gobin
+        gbin=$(pwd)/gobin
         mkdir -p ${gbin}
         export GOBIN="${gbin}"
         go install fyne.io/fyne/v2/cmd/fyne@latest
-    - name: Check versions and vars
+    - name: Check env setup
       run: |
+        gbin=$(pwd)/gobin
+        export GOBIN="${gbin}"
+        export PATH="${PATH}:${GOBIN}"
         go version
+        fyne --version
         which bash
-        echo "shell $SHELL"
         echo "gobin: ${GOBIN}"
       
