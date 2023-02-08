@@ -15,14 +15,17 @@ defaults:
 
 jobs:
   build_from_makefile:
-    env:
-      GOBIN: "${{env.GITHUB_ACTION_PATH}}/gobin"
     name: "Building"
     runs-on: ubuntu-latest
     steps:
-      - name: Test paths
-        run: |
-          echo "gobin: ${GOBIN}"
-          echo "bash: $(which bash)"
+    - uses: actions/setup-go@v3
+      with:
+        go-version: '1.19'
+      env:
+        GOPATH: $HOME
+    - run: go env
+    - run: echo "gopath ${GOPATH}"
+    - run: echo "gobin ${GOBIN}"
+    - run: echo "bash $(which bash)"
 
       
