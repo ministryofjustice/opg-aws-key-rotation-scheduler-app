@@ -19,7 +19,7 @@ func UpdateMenu() {
 
 	if _track.Locked() {
 		MenuKeyLocked()
-	} else if now.After(at) {
+	} else if now.After(at) && !_booting {
 		MenuRotate()
 	} else {
 		_menuInformation.Label = fmt.Sprintf(

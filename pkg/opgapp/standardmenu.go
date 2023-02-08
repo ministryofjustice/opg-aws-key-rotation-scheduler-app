@@ -28,6 +28,7 @@ func SetupStandardMenu() {
 	go func() {
 		dur := time.Minute
 		for range time.Tick(dur) {
+			_booting = false
 			fmt.Println("tick")
 			UpdateMenu()
 		}

@@ -23,7 +23,8 @@ var (
 )
 
 var (
-	_mu *sync.Mutex
+	_mu      *sync.Mutex
+	_booting bool
 )
 
 var (
@@ -37,6 +38,7 @@ func New(
 	settingsFile string,
 ) {
 	_mu = &sync.Mutex{}
+	_booting = true
 	_app = app.New()
 
 	_settings = LoadSettings(filepath.Join(project.ROOT_DIR, settingsFile))
