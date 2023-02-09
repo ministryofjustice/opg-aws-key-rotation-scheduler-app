@@ -24,7 +24,7 @@ all: $(OS_AND_ARCHS_TO_BUILD)
 
 darwin_arm64: requirements
 	@mkdir -p $(BUILD_FOLDER)$@/
-	env GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go 2>/dev/null
+	env GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go
 	cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
 	@cat $(BUILD_FOLDER)$@/${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > $(BUILD_FOLDER)$@/${PLIST_TEMP}
 	@mv $(BUILD_FOLDER)$@/${PLIST_TEMP} $(BUILD_FOLDER)$@/${PLIST}
@@ -32,7 +32,7 @@ darwin_arm64: requirements
 
 darwin_amd64: requirements
 	@mkdir -p $(BUILD_FOLDER)$@/
-	env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go 2>/dev/null
+	env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go
 	cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
 	@cat $(BUILD_FOLDER)$@/${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > $(BUILD_FOLDER)$@/${PLIST_TEMP}
 	@mv $(BUILD_FOLDER)$@/${PLIST_TEMP} $(BUILD_FOLDER)$@/${PLIST}
