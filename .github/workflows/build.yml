@@ -84,8 +84,12 @@ jobs:
       - name: Download artifacts from this workflow run
         uses: actions/download-artifact@v3
         with:
-          path: ./builds/
-      - run: ls -lart ./builds/
+          path: ./builds/      
+      - run: |
+          cd ./builds/
+          tar -czf release.tgz ${{env.APP_NAME}}*
+          ls -lart
+          cd -
       - name: Create release
         if: ${{ needs.branch_name.outputs.parsed == 'main' }}
         uses: softprops/action-gh-release@v1
@@ -98,5 +102,5 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: true
           files: |
-            **/*.app*
+            builds/release.tgz
             
