@@ -13,7 +13,7 @@ defaults:
 
 env:
   APP_NAME: "OPGAWSKeyRotation"
-  TAR: macos-apps
+  TAR: macos
 
 jobs:
   branch_name:
@@ -66,12 +66,15 @@ jobs:
       uses: actions/checkout@v3
     - name: BUILD via makefile
       run: make ${{ matrix.target_architecture }}
-    - run: ls -larth ./builds/${{ matrix.target_architecture }}/**/Contents/MacOS
+    - name: Create tar ball of the app
+      run: |
+        cd ./builds/${{ matrix.target_architecture }}/
+        tar -czf ${{ matrix.target_architecture }}.tgz ${{ env.APP_NAME }}.app
     - name: Upload application artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.APP_NAME }}_${{ matrix.target_architecture }}.app
-        path: ./builds/${{ matrix.target_architecture }}/${{ env.APP_NAME }}.app
+        name: ${{ matrix.target_architecture }}.tgz
+        path: ./builds/${{ matrix.target_architecture }}.tgz
     - run: echo "done"
   
   create_app_release:
@@ -86,9 +89,15 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: ./builds/      
-      - run: |
+      - name: Extract artifacts and merge into one tar
+        run: |
           cd ./builds/
-          tar -czf ${{env.TAR}}.tgz ${{env.APP_NAME}}*
+          find . -name '*.tgz' -exec sh -c 'd=$(basename -- "${0}"); dir="${d%.*}";mkdir -p ${dir}; tar -xvf "${0}" -C "${dir}"; ' {} \;
+          ls -lart
+          rm -f *.tgz
+          ls -lart
+          tar -czf ${{ env.TAR }}.tgz darwin*
+          ls -lart
           cd -
       - name: Create release
         if: ${{ needs.branch_name.outputs.parsed == 'main' }}
@@ -102,5 +111,5 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: true
           files: |
-            builds/*            
+            builds/${{ env.TAR }}.tgz      
             
