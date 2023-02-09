@@ -15,7 +15,7 @@ USER_PROFILE := ~/.zprofile
 
 .DEFAULT_GOAL: self
 .PHONY: self all requirements darwin_arm64 darwin_amd64
-.ONESHELL:
+.ONESHELL: self all requirements darwin_arm64 darwin_amd64
 .EXPORT_ALL_VARIABLES:
 
 
@@ -27,7 +27,7 @@ all: $(OS_AND_ARCHS_TO_BUILD)
 darwin_arm64: requirements
 	@mkdir -p $(BUILD_FOLDER)$@/
 	env GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go
-	cd $(BUILD_FOLDER)$@/ && source ${USER_PROFILE} && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
+	cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
 	@cat $(BUILD_FOLDER)$@/${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > $(BUILD_FOLDER)$@/${PLIST_TEMP}
 	@mv $(BUILD_FOLDER)$@/${PLIST_TEMP} $(BUILD_FOLDER)$@/${PLIST}
 	@echo Build $@ complete.
@@ -35,7 +35,7 @@ darwin_arm64: requirements
 darwin_amd64: requirements
 	@mkdir -p $(BUILD_FOLDER)$@/
 	env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go
-	cd $(BUILD_FOLDER)$@/ && source ${USER_PROFILE} && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
+	cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
 	@cat $(BUILD_FOLDER)$@/${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > $(BUILD_FOLDER)$@/${PLIST_TEMP}
 	@mv $(BUILD_FOLDER)$@/${PLIST_TEMP} $(BUILD_FOLDER)$@/${PLIST}
 	@echo Build $@ complete.
@@ -58,3 +58,5 @@ ifeq (, $(shell which fyne))
 endif
 	@echo All requirements checked
 	@rm -Rf ${BUILD_FOLDER}
+	@test -f ${USER_PROFILE} && source ${USER_PROFILE} || echo ${USER_PROFILE} not found
+	
