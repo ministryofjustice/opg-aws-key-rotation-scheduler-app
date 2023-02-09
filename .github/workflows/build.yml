@@ -60,11 +60,31 @@ jobs:
       uses: actions/checkout@v3
     - run: make ${{ matrix.target_architecture }}
     - run: ls -larth ./builds/${{ matrix.target_architecture }}/**/Contents/MacOS
-    - name: Upload application
+    - name: Upload application artifacts
       uses: actions/upload-artifact@v3
       with:
         name: OPGAWSKeyRotation_${{ matrix.target_architecture }}.app
         path: ./builds/${{ matrix.target_architecture }}/OPGAWSKeyRotation.app
+    - name: Create release for ${{ matrix.target_architecture }}
+      if: ${{ needs.branch_name.outputs.parsed == 'main' }}
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ needs.semvar_tag.outputs.tag }}
+        release_name: ${{ steps.semvar_tag.outputs.tag }}
+        draft: false
+        prerelease: false
+    - name: Create pre-release for ${{ matrix.target_architecture }}
+      if: ${{ needs.branch_name.outputs.parsed != 'main' }}
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ needs.semvar_tag.outputs.tag }}
+        release_name: ${{ steps.semvar_tag.outputs.tag }}
+        draft: false
+        prerelease: true
 
 
         
