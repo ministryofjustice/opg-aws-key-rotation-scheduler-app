@@ -78,42 +78,36 @@ jobs:
         path: ./builds/${{ matrix.target_architecture }}/${{ matrix.target_architecture }}.tgz
     - run: echo "done"
   
-  # create_app_release:
-  #   runs-on: "macos-latest"
-  #   needs: [build_from_makefile, branch_name, semvar_tag]
-  #   name: "Create releases"
-  #   steps:     
-  #     - name: Checkout Repo
-  #       uses: actions/checkout@v3
-  #     - run: mkdir -p ./builds/
-  #     - name: Download artifacts from this workflow run
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         path: ./builds/      
-  #     - name: Extract artifacts and merge into one tar
-  #       run: |
-  #         cd ./builds/
-  #         ls -lart
-  #         unzip *.zip
-  #         ls -lart
-  #         find . -name '*.tgz' -exec sh -c 'd=$(basename -- "${0}"); dir="${d%.*}";mkdir -p ${dir}; tar -xvf "${0}" -C "${dir}"; ' {} \;
-  #         ls -lart
-  #         rm -f *.tgz
-  #         ls -lart
-  #         tar -czf ${{ env.TAR }}.tgz darwin*
-  #         ls -lart          
-  #         cd -
-  #     - name: Create release
-  #       if: ${{ needs.branch_name.outputs.parsed == 'main' }}
-  #       uses: softprops/action-gh-release@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         tag_name: ${{ needs.semvar_tag.outputs.tag }}
-  #         draft: false
-  #         prerelease: false
-  #         fail_on_unmatched_files: true
-  #         generate_release_notes: true
-  #         files: |
-  #           builds/${{ env.TAR }}.tgz      
+  create_app_release:
+    runs-on: "macos-latest"
+    needs: [build_from_makefile, branch_name, semvar_tag]
+    name: "Create releases"
+    steps:     
+      - run: mkdir -p ./builds/
+      - name: Download artifacts from this workflow run
+        uses: actions/download-artifact@v3
+        with:
+          path: ./builds/      
+      - name: Extract artifacts and merge into one tar
+        run: |
+          cd ./builds/
+          ls -lart
+          unzip *.zip
+          ls -lartRh
+          find . -name '*.tgz' -exec sh -c 'd=$(basename -- "${0}"); dir="${d%.*}";mkdir -p ${dir}; tar -xvf "${0}" -C "${dir}"; ' {} \;
+          ls -lartRh
+          cd -
+      # - name: Create release
+      #   if: ${{ needs.branch_name.outputs.parsed == 'main' }}
+      #   uses: softprops/action-gh-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ needs.semvar_tag.outputs.tag }}
+      #     draft: false
+      #     prerelease: false
+      #     fail_on_unmatched_files: true
+      #     generate_release_notes: true
+      #     files: |
+      #       builds/${{ env.TAR }}.tgz      
             
