@@ -48,9 +48,14 @@ If it is older, then a rotation is triggered.
 
 If you want to adjust this app or create a build locally then you will need to ensure some items are confgured and installed first:
 
+- macOS >= 10.11
 - go >= 1.19
 - env variable `${GOBIN}` set to a folder path that exists
 - `${GOBIN}` path is present within you `${PATH}`
 - fyne >= 2.3.0 installed within `${GOBIN}` by running `go install fyne.io/fyne/v2/cmd/fyne@v2.3.0`
 
-The `Makefile` will attempt to resolve these for you within the `requirements` target. 
+The `Makefile` will attempt to resolve these for you within the `requirements` target.
+
+To create an app for your macOs version, from the root of the directory run `make` and check the content of the `./builds/` folder.
+
+If you want to create application for all supported architectures, use `make all`
