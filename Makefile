@@ -1,5 +1,5 @@
 SHELL := $(shell which bash)
-APPNAME := OPG AWS Key Rotation
+APPNAME := OPGAWSKeyRotation
 
 OS := $(shell uname | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m)
