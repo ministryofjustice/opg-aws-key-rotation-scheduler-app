@@ -19,7 +19,7 @@ jobs:
   semvar_tag:
     needs: [branch_name]
     name: "Get tag for (${{ needs.branch_name.outputs.parsed }})"
-    uses: ministryofjustice/opg-github-workflows/.github/workflows/data-parse-semvar-tag.yml
+    uses: ministryofjustice/opg-github-workflows/.github/workflows/data-parse-semvar-tag.yml@main
     with:
       branch_name: ${{ needs.branch_name.outputs.parsed }}
     secrets: inherit
