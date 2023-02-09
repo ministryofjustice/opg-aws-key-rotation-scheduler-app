@@ -31,7 +31,7 @@ jobs:
   build_from_makefile:
     needs: [branch_name, semvar_tag]
     name: "Building"
-    runs-on: macos-latest
+    runs-on: macos-12
     strategy:
       matrix:
         target_architecture: ["darwin_arm64", "darwin_amd64"]
@@ -70,8 +70,7 @@ jobs:
       run: |
         cd ./builds/${{ matrix.target_architecture }}/
         tar -czf ${{ matrix.target_architecture }}.tgz ${{ env.APP_NAME }}.app
-        pwd
-        ls -lart
+        ls -larthR 
     - name: Upload application artifacts
       uses: actions/upload-artifact@v3
       with:
