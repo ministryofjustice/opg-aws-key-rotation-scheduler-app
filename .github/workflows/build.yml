@@ -90,10 +90,12 @@ jobs:
           path: ./builds/      
       - name: Extract artifacts and merge into one tar
         run: |
+          mkdir -p ./apps/
           cd ./builds/
-          ls -lartRh
+          echo "extract tars"
           find . -name '*.tgz' -exec sh -c 'd=$(basename -- "${0}"); dir="${d%.*}";mkdir -p ${dir}; tar -xvf "${0}" -C "${dir}"; ' {} \;
-          ls -lartRh
+          echo "find apps"
+          find . -name '*.app' -exec sh -c 'echo "app: ${0}"; ' {} \;
           cd -
       # - name: Create release
       #   if: ${{ needs.branch_name.outputs.parsed == 'main' }}

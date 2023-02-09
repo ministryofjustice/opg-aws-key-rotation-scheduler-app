@@ -46,13 +46,27 @@ If it is older, then a rotation is triggered.
 
 # Setup for local development / build
 
+Clone the repository to you local drive and from the root directory run:
+```
+make
+```
+
+If successful, an application will be created at:
+```
+./builds/darwin_${ARCH}/
+```
+Where `${ARCH}` is either `amd64` or `arm64`.
+
+## Details
+
 If you want to adjust this app or create a build locally then you will need to ensure some items are confgured and installed first:
 
-- macOS >= 10.11
-- go >= 1.19
+- `macOS` >= 10.11
+- `go` >= 1.19
 - env variable `${GOBIN}` set to a folder path that exists
-- `${GOBIN}` path is present within you `${PATH}`
-- fyne >= 2.3.0 installed within `${GOBIN}` by running `go install fyne.io/fyne/v2/cmd/fyne@v2.3.0`
+- `${GOBIN}` path is present within your `${PATH}`
+- `fyne` >= 2.3.0 installed within `${GOBIN}` 
+  - install manually by running  `go install fyne.io/fyne/v2/cmd/fyne@v2.3.0`
 
 The `Makefile` will attempt to resolve these for you within the `requirements` target.
 
