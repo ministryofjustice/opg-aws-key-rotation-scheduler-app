@@ -91,8 +91,6 @@ jobs:
       - name: Extract artifacts and merge into one tar
         run: |
           cd ./builds/
-          ls -lart
-          unzip *.zip
           ls -lartRh
           find . -name '*.tgz' -exec sh -c 'd=$(basename -- "${0}"); dir="${d%.*}";mkdir -p ${dir}; tar -xvf "${0}" -C "${dir}"; ' {} \;
           ls -lartRh
