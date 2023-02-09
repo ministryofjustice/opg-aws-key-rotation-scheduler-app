@@ -83,21 +83,19 @@ jobs:
     needs: [build_from_makefile, branch_name, semvar_tag]
     name: "Create releases"
     steps:     
-      - run: mkdir -p ./builds/
+      - run: mkdir -p ./builds/ ./apps/
       - name: Download artifacts from this workflow run
         uses: actions/download-artifact@v3
         with:
           path: ./builds/      
       - name: Extract artifacts and merge into one tar
         run: |
-          mkdir -p ./apps/
-          cd ./builds/
-          echo "extract tars"
-          find . -name '*.tgz' -exec sh -c 'd=$(basename -- "${0}"); dir="${d%.*}";mkdir -p ${dir}; tar -xvf "${0}" -C "${dir}"; ' {} \;
-          echo "find apps"
-          find . -name '*.app' -exec sh -c 'echo "app: ${0}"; mv ${0} ../apps/' {} \;
+          cd ./builds/darwin_arm64/
+          tar -xvf ./darwin_arm64.tgz
+          ls -larthR 
+          mv ${{env.APP_NAME}}.app ../../apps/
           cd -
-          ls -larth ./apps/
+          ls -larthR ./apps/
       # - name: Create release
       #   if: ${{ needs.branch_name.outputs.parsed == 'main' }}
       #   uses: softprops/action-gh-release@v1
