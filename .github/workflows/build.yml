@@ -110,7 +110,5 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: true
           files: |
-            apps/
             apps/**
-            apps/${{env.APP_NAME}}.darwin_arm64.app
             
