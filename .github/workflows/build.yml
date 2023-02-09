@@ -74,7 +74,7 @@ jobs:
     - name: Upload application artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.target_architecture }}.tgz
+        name: ${{ matrix.target_architecture }}
         path: ./builds/${{ matrix.target_architecture }}/${{ matrix.target_architecture }}.tgz
     - run: echo "done"
   
