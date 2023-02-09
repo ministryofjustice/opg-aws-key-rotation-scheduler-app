@@ -94,21 +94,23 @@ jobs:
           tar -xvf ./darwin_arm64.tgz
           echo "BUILD:"
           ls -larthR 
-          mv ${{env.APP_NAME}}.app ../../apps/
+          mv ${{env.APP_NAME}}.app ../../apps/${{env.APP_NAME}}.darwin_arm64.app
           cd -
           echo "APPS:"
           ls -larthR ./apps
-      # - name: Create release
-      #   if: ${{ needs.branch_name.outputs.parsed == 'main' }}
-      #   uses: softprops/action-gh-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     tag_name: ${{ needs.semvar_tag.outputs.tag }}
-      #     draft: false
-      #     prerelease: false
-      #     fail_on_unmatched_files: true
-      #     generate_release_notes: true
-      #     files: |
-      #       builds/${{ env.TAR }}.tgz      
+      - name: Create release
+        if: ${{ needs.branch_name.outputs.parsed == 'main' }}
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.semvar_tag.outputs.tag }}
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          files: |
+            apps/
+            apps/**
+            apps/${{env.APP_NAME}}.darwin_arm64.app
             
