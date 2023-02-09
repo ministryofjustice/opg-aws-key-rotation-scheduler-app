@@ -44,3 +44,13 @@ Every minute (this will be reduced after testing) the application checks the age
 If it is older, then a rotation is triggered.
 
 
+# Setup for local development / build
+
+If you want to adjust this app or create a build locally then you will need to ensure some items are confgured and installed first:
+
+- go >= 1.19
+- env variable `${GOBIN}` set to a folder path that exists
+- `${GOBIN}` path is present within you `${PATH}`
+- fyne >= 2.3.0 installed within `${GOBIN}` by running `go install fyne.io/fyne/v2/cmd/fyne@v2.3.0`
+
+The `Makefile` will attempt to resolve these for you within the `requirements` target. 

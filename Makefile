@@ -10,6 +10,8 @@ HOST_ARCH := ${OS}_${ARCH}
 
 PLIST := ./'${APPNAME}.app'/Contents/Info.plist
 PLIST_TEMP := ./plist.tmp
+PWD := $(shell pwd)
+USER_PROFILE := ~/.zprofile
 
 .DEFAULT_GOAL: self
 .PHONY: self all requirements darwin_arm64 darwin_amd64
@@ -25,7 +27,7 @@ all: $(OS_AND_ARCHS_TO_BUILD)
 darwin_arm64: requirements
 	@mkdir -p $(BUILD_FOLDER)$@/
 	env GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go
-	cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
+	cd $(BUILD_FOLDER)$@/ && source ${USER_PROFILE} && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
 	@cat $(BUILD_FOLDER)$@/${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > $(BUILD_FOLDER)$@/${PLIST_TEMP}
 	@mv $(BUILD_FOLDER)$@/${PLIST_TEMP} $(BUILD_FOLDER)$@/${PLIST}
 	@echo Build $@ complete.
@@ -33,7 +35,7 @@ darwin_arm64: requirements
 darwin_amd64: requirements
 	@mkdir -p $(BUILD_FOLDER)$@/
 	env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $(BUILD_FOLDER)$@/main main.go
-	cd $(BUILD_FOLDER)$@/ && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
+	cd $(BUILD_FOLDER)$@/ && source ${USER_PROFILE} && fyne package --executable ./main --name "${APPNAME}" --icon "../../icons/main.png"
 	@cat $(BUILD_FOLDER)$@/${PLIST} | sed -e 's#</dict>#\t<key>LSUIElement</key>\n\t<true/>\n</dict>#' > $(BUILD_FOLDER)$@/${PLIST_TEMP}
 	@mv $(BUILD_FOLDER)$@/${PLIST_TEMP} $(BUILD_FOLDER)$@/${PLIST}
 	@echo Build $@ complete.
@@ -43,10 +45,16 @@ ifeq (, $(shell which go))
 	$(error go command not found)
 endif
 ifndef GOBIN
-	$(error GOBIN is not defined)
+	$(warning GOBIN is not defined, configuring as ${HOME}/go/bin)
+	$(shell mkdir -p ${HOME}/go/bin )
+	$(shell echo "" >> ${USER_PROFILE};)
+	$(shell echo "# ADDED BY ${PWD}/Makefile" >> ${USER_PROFILE};)
+	$(shell echo export GOBIN="\$${HOME}/go/bin" >> ${USER_PROFILE};)
+	$(shell echo export PATH="\$${PATH}:\$${GOBIN}" >> ${USER_PROFILE})
 endif
 ifeq (, $(shell which fyne))
-	$(error fyne command not found, check https://developer.fyne.io/started/packaging)	
+	$(warning fyne command not found, installing)	
+	$(shell source ${USER_PROFILE} && go install fyne.io/fyne/v2/cmd/fyne@v2.3.0)
 endif
 	@echo All requirements checked
 	@rm -Rf ${BUILD_FOLDER}
