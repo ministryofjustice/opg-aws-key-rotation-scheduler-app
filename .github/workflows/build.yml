@@ -70,11 +70,13 @@ jobs:
       run: |
         cd ./builds/${{ matrix.target_architecture }}/
         tar -czf ${{ matrix.target_architecture }}.tgz ${{ env.APP_NAME }}.app
+        pwd
+        ls -lart
     - name: Upload application artifacts
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.target_architecture }}.tgz
-        path: ./builds/${{ matrix.target_architecture }}.tgz
+        path: ./builds/${{ matrix.target_architecture }}/${{ matrix.target_architecture }}.tgz
     - run: echo "done"
   
   create_app_release:
