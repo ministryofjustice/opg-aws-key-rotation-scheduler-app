@@ -11,6 +11,9 @@ defaults:
   run:
     shell: bash
 
+env:
+  APP_NAME: "OPGAWSKeyRotation"
+
 jobs:
   branch_name:
     name: Get branch name
@@ -66,8 +69,8 @@ jobs:
     - name: Upload application artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: OPGAWSKeyRotation_${{ matrix.target_architecture }}.app
-        path: ./builds/${{ matrix.target_architecture }}/OPGAWSKeyRotation.app
+        name: ${{ env.APP_NAME }}_${{ matrix.target_architecture }}.app
+        path: ./builds/${{ matrix.target_architecture }}/${{ env.APP_NAME }}.app
     - run: echo "done"
   
   create_app_release:
@@ -81,3 +84,29 @@ jobs:
         uses: actions/download-artifact@v3
       - run: |
           ls -lart *
+      - name: Create pre-release
+        if: ${{ needs.branch_name.outputs.parsed != 'main' }}
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.semvar_tag.outputs.tag }}
+          release_name: ${{ steps.semvar_tag.outputs.tag }}
+          draft: false
+          prerelease: true
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          files: "${{env.APP_NAME}}_*"
+      - name: Create release 
+        if: ${{ needs.branch_name.outputs.parsed == 'main' }}
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.semvar_tag.outputs.tag }}
+          release_name: ${{ steps.semvar_tag.outputs.tag }}
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          files: "${{env.APP_NAME}}_*"
