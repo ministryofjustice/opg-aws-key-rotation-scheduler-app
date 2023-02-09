@@ -31,16 +31,7 @@ jobs:
     strategy:
       matrix:
         target_architecture: ["darwin_arm64", "darwin_amd64"]
-    steps:
-    - name: Output branch / semvar 
-      run: |
-        echo "== BRANCH =="
-        echo "Raw: ${{ needs.branch_name.outputs.raw }}"
-        echo "Parsed: ${{ needs.branch_name.outputs.parsed }}"
-        echo "Alphanumeric: ${{ needs.branch_name.outputs.alphanumeric }}"
-        echo "== SEMVAR =="
-        echo "Tag: ${{ needs.semvar_tag.outputs.tag }}"
-        echo "New Tag: ${{ needs.semvar_tag.outputs.new_tag }}"
+    steps:   
     - uses: actions/setup-go@v3
       with:
         go-version: '1.19'
@@ -50,15 +41,27 @@ jobs:
         mkdir -p ${GOBIN}
         echo "GOBIN=${GOBIN}" >> $GITHUB_ENV
         echo "PATH=${PATH}:${GOBIN}" >> $GITHUB_ENV
-    - run: go version
-    - run: go env
-    - run: echo "gobin ${GOBIN}"
-    - run: echo "bash $(which bash)"
     - run: go install fyne.io/fyne/v2/cmd/fyne@v2.3.0
-    - run: fyne version
+    - name: Output env & var data
+      run: |
+        echo "== BRANCH =="
+        echo "Raw: ${{ needs.branch_name.outputs.raw }}"
+        echo "Parsed: ${{ needs.branch_name.outputs.parsed }}"
+        echo "Alphanumeric: ${{ needs.branch_name.outputs.alphanumeric }}"
+        echo "== SEMVAR =="
+        echo "Tag: ${{ needs.semvar_tag.outputs.tag }}"
+        echo "New Tag: ${{ needs.semvar_tag.outputs.new_tag }}"
+        echo "== GO =="
+        echo "version: $(go version)"        
+        echo "gobin: ${GOBIN}"
+        echo "fyne: $(fyne version)"
+        echo "== PATHING =="
+        echo "path: ${PATH}"
+        echo "bash $(which bash)"    
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - run: make ${{ matrix.target_architecture }}
+    - name: BUILD via makefile
+      run: make ${{ matrix.target_architecture }}
     - run: ls -larth ./builds/${{ matrix.target_architecture }}/**/Contents/MacOS
     - name: Upload application artifacts
       uses: actions/upload-artifact@v3
@@ -73,6 +76,8 @@ jobs:
     name: "Create releases"
     steps:     
       - name: Download artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh run download ${{github.run_id}}
           ls -lart *
