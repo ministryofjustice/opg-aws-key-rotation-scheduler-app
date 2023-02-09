@@ -1,9 +1,8 @@
 package opgapp
 
 import (
-	"opg-aws-key-rotation-scheduler-app/internal/project"
+	"embed"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
-	"path/filepath"
 	"sync"
 	"time"
 
@@ -20,6 +19,7 @@ var (
 	_supported       *Supports
 	_track           *AccessKeyTracker
 	_rotateFrequency string
+	_iconFS          embed.FS
 	_icons           ThemeIcons
 )
 
@@ -37,14 +37,15 @@ var (
 )
 
 func New(
-	settingsFile string,
+	settingsContent []byte,
+	iconFS embed.FS,
 ) {
-
+	_iconFS = iconFS
 	_mu = &sync.Mutex{}
 	_booting = true
 	_app = app.New()
 
-	_settings = LoadSettings(filepath.Join(project.ROOT_DIR, settingsFile))
+	_settings = LoadSettings(settingsContent)
 
 	debugger.SetupFileLogging(_settings.AccessKeys.Dir())
 	debugger.Log("Settings loaded", debugger.INFO, _settings.JsonBytes())()

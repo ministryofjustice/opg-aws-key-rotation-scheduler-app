@@ -28,16 +28,16 @@
     "icons": {
        
         "default": {
-            "black": "/icons/menu.black.png",
-            "white": "/icons/menu.white.png"
+            "black": "icons/menu.black.png",
+            "white": "icons/menu.white.png"
         },
         "rotating": {
-            "black": "/icons/rotating.png",
-            "white": "/icons/rotating.png"
+            "black": "icons/rotating.png",
+            "white": "icons/rotating.png"
         },
         "locked": {
-            "black": "/icons/locked.png",
-            "white": "/icons/locked.png"
+            "black": "icons/locked.png",
+            "white": "icons/locked.png"
         }
         
     },

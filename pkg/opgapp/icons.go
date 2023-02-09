@@ -1,10 +1,7 @@
 package opgapp
 
 import (
-	"io/ioutil"
-	"opg-aws-key-rotation-scheduler-app/internal/project"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
-	"path/filepath"
 
 	"fyne.io/fyne/v2"
 )
@@ -47,22 +44,22 @@ type ThemeIcons struct {
 
 // Default generates a Resource based on the default file path
 func (ti ThemeIcons) Default() (r fyne.Resource) {
-	path := filepath.Join(project.ROOT_DIR, ti.DefaultIcon)
-	content, _ := ioutil.ReadFile(path)
+	path := ti.DefaultIcon
+	content, _ := _iconFS.ReadFile(path)
 	r = fyne.NewStaticResource("default-icon", content)
 	return
 }
 
 func (ti ThemeIcons) Rotating() (r fyne.Resource) {
-	path := filepath.Join(project.ROOT_DIR, ti.RotatingIcon)
-	content, _ := ioutil.ReadFile(path)
+	path := ti.RotatingIcon
+	content, _ := _iconFS.ReadFile(path)
 	r = fyne.NewStaticResource("rotating-icon", content)
 	return
 }
 
 func (ti ThemeIcons) Locked() (r fyne.Resource) {
-	path := filepath.Join(project.ROOT_DIR, ti.LockedIcon)
-	content, _ := ioutil.ReadFile(path)
+	path := ti.LockedIcon
+	content, _ := _iconFS.ReadFile(path)
 	r = fyne.NewStaticResource("locked-icon", content)
 	return
 }

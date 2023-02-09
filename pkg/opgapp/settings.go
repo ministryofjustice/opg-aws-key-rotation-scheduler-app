@@ -2,7 +2,6 @@ package opgapp
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"runtime"
 )
@@ -44,11 +43,9 @@ func (s *Settings) JsonBytes() (content string) {
 }
 
 // ---
-func LoadSettings(file string) (s *Settings) {
+func LoadSettings(content []byte) (s *Settings) {
 
 	s = &Settings{}
-	content, _ := ioutil.ReadFile(file)
-	json.Unmarshal([]byte(content), &s)
-
+	json.Unmarshal(content, &s)
 	return
 }
