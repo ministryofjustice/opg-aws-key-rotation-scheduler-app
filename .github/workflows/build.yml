@@ -1,4 +1,4 @@
-name: "[Build] Create binary and app"
+name: "[Build] Create app and release"
 
 on:
   workflow_dispatch:
@@ -77,14 +77,7 @@ jobs:
     steps:     
       - name: Checkout Repo
         uses: actions/checkout@v3
-      - name: Download artifacts
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh run download ${{github.run_id}}
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v3
+      - run: |
           ls -lart *
-
-      
-
-
-      
