@@ -92,10 +92,12 @@ jobs:
         run: |
           cd ./builds/darwin_arm64/
           tar -xvf ./darwin_arm64.tgz
+          echo "BUILD:"
           ls -larthR 
           mv ${{env.APP_NAME}}.app ../../apps/
           cd -
-          ls -larthR ./apps/
+          echo "APPS:"
+          ls -larthR ./apps
       # - name: Create release
       #   if: ${{ needs.branch_name.outputs.parsed == 'main' }}
       #   uses: softprops/action-gh-release@v1
