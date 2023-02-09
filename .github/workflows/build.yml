@@ -95,8 +95,14 @@ jobs:
         run: |
           cd ./builds/
           ls -lart
-
-          
+          unzip *.zip
+          ls -lart
+          find . -name '*.tgz' -exec sh -c 'd=$(basename -- "${0}"); dir="${d%.*}";mkdir -p ${dir}; tar -xvf "${0}" -C "${dir}"; ' {} \;
+          ls -lart
+          rm -f *.tgz
+          ls -lart
+          tar -czf ${{ env.TAR }}.tgz darwin*
+          ls -lart          
           cd -
       - name: Create release
         if: ${{ needs.branch_name.outputs.parsed == 'main' }}
