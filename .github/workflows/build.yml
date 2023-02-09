@@ -80,10 +80,12 @@ jobs:
     steps:     
       - name: Checkout Repo
         uses: actions/checkout@v3
+      - run: mkdir -p ./builds/
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v3
-      - run: |
-          ls -lart *
+        with:
+          path: ./builds/
+      - run: ls -lart ./builds/
       - name: Create pre-release
         if: ${{ needs.branch_name.outputs.parsed != 'main' }}
         uses: softprops/action-gh-release@v1
@@ -95,7 +97,7 @@ jobs:
           prerelease: true
           fail_on_unmatched_files: true
           generate_release_notes: true
-          files: "${{env.APP_NAME}}_*"
+          files: "./builds/*"
       - name: Create release 
         if: ${{ needs.branch_name.outputs.parsed == 'main' }}
         uses: softprops/action-gh-release@v1
@@ -107,4 +109,4 @@ jobs:
           prerelease: false
           fail_on_unmatched_files: true
           generate_release_notes: true
-          files: "${{env.APP_NAME}}_*"
+          files: "./builds/*"
