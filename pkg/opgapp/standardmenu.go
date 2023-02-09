@@ -2,12 +2,14 @@ package opgapp
 
 import (
 	"fmt"
+	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"time"
 
 	"fyne.io/fyne/v2"
 )
 
 func SetupStandardMenu() {
+	debugger.Log("Setup standard menu", debugger.INFO)()
 
 	_menuRotate = fyne.NewMenuItem(_labels.Rotate, func() {
 		_mu.Lock()
@@ -29,7 +31,7 @@ func SetupStandardMenu() {
 		dur := time.Minute
 		for range time.Tick(dur) {
 			_booting = false
-			fmt.Println("tick")
+			debugger.Log("standard menu tick", debugger.INFO)()
 			UpdateMenu()
 		}
 	}()

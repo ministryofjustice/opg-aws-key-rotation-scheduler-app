@@ -1,6 +1,7 @@
 package opgapp
 
 import (
+	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"os"
 	"os/exec"
 	"runtime"
@@ -33,5 +34,6 @@ func OsTheme() (mode string) {
 			mode = strings.ReplaceAll(strings.ToLower(output.String()), "\n", "")
 		}
 	}
+	defer debugger.Log("OsTheme()", debugger.VERBOSE, "mode:", mode)()
 	return
 }

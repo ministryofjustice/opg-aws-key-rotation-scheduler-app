@@ -3,6 +3,7 @@ package opgapp
 import (
 	"io/ioutil"
 	"opg-aws-key-rotation-scheduler-app/internal/project"
+	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"path/filepath"
 
 	"fyne.io/fyne/v2"
@@ -33,6 +34,7 @@ func (m *MenuIcons) Themed(s *Settings) (icons ThemeIcons) {
 	if OsTheme() == "dark" {
 		icons = ThemeIcons{DefaultIcon: m.Default.White, RotatingIcon: m.Rotating.White, LockedIcon: m.Locked.White}
 	}
+	defer debugger.Log("Themed icons", debugger.VERBOSE, icons)()
 	return
 }
 

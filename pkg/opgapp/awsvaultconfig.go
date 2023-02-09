@@ -1,6 +1,7 @@
 package opgapp
 
 import (
+	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"runtime"
 )
 
@@ -14,5 +15,6 @@ func (avc *AwsVaultConfig) OsSpecific() (osSpecific AwsVaultOsSpecific) {
 	case "darwin":
 		osSpecific = avc.Darwin
 	}
+	defer debugger.Log("AwsVaultConfig.OsSpecific()", debugger.VERBOSE, osSpecific)()
 	return
 }

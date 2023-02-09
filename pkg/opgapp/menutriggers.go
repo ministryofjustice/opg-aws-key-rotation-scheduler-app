@@ -2,6 +2,7 @@ package opgapp
 
 import (
 	"fmt"
+	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"time"
 )
 
@@ -10,7 +11,7 @@ import (
 func UpdateMenu() {
 	now := time.Now().UTC()
 	at := _track.RotateAt(_rotateFrequency)
-	fmt.Printf("[%s] next rotation at [%s]\n", now, at)
+	debugger.Log("UpdateMenu", debugger.INFO, at, now)()
 
 	_mu.Lock()
 	if _track.Locked() && _track.LockIsOld() {
@@ -35,7 +36,7 @@ func UpdateMenu() {
 // that the rotate failed or was cancelled and therefore
 // cleanup the file and carry on
 func MenuKeyOldLock() {
-	fmt.Println("Key is locked and too old, so removing...")
+	debugger.Log("MenuKeyOldLock", debugger.INFO, "Key is locked and too old, so removing...")()
 	_track.Unlock()
 }
 
@@ -43,7 +44,7 @@ func MenuKeyOldLock() {
 // lock file present on the filesystem and there presume
 // a rotate is in progress
 func MenuKeyLocked() {
-	fmt.Println("Key is locked...")
+	debugger.Log("MenuKeyLocked", debugger.INFO, "Key is locked...")()
 	_menuRotate.Disabled = false
 	_menuInformation.Label = _labels.Locked
 	_desk.SetSystemTrayIcon(_icons.Locked())
@@ -53,7 +54,7 @@ func MenuKeyLocked() {
 // MenuRotate handles the gui changes and func calls to change
 // a key and show the status of that change
 func MenuRotate() {
-	fmt.Println("Rotating key...")
+	debugger.Log("MenuRotate", debugger.INFO, "Rotating key...")()
 	_track.Lock()
 
 	_desk.SetSystemTrayIcon(_icons.Rotating())

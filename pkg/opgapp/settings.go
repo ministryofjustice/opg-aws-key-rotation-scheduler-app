@@ -3,6 +3,7 @@ package opgapp
 import (
 	"encoding/json"
 	"io/ioutil"
+	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"runtime"
 )
 
@@ -33,13 +34,21 @@ func (s *Settings) Os() (info *OsInfo) {
 	case "darwin":
 		info = &s.OsData.Darwin
 	}
+	defer debugger.Log("OS info", debugger.VERBOSE, info)()
 	return
+}
+
+func (s *Settings) JsonBytes() (content string) {
+	b, _ := json.Marshal(s)
+	return string(b)
 }
 
 // ---
 func LoadSettings(file string) (s *Settings) {
+
 	s = &Settings{}
 	content, _ := ioutil.ReadFile(file)
 	json.Unmarshal([]byte(content), &s)
+
 	return
 }

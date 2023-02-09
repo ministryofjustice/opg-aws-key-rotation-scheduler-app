@@ -2,6 +2,7 @@ package opgapp
 
 import (
 	"opg-aws-key-rotation-scheduler-app/internal/project"
+	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"path/filepath"
 	"sync"
 	"time"
@@ -38,11 +39,16 @@ var (
 func New(
 	settingsFile string,
 ) {
+
 	_mu = &sync.Mutex{}
 	_booting = true
 	_app = app.New()
 
 	_settings = LoadSettings(filepath.Join(project.ROOT_DIR, settingsFile))
+
+	debugger.SetupFileLogging(_settings.AccessKeys.Dir())
+	debugger.Log("Settings loaded", debugger.INFO, _settings.JsonBytes())()
+
 	_rotateFrequency = _settings.RotationFrequency
 	_os = _settings.Os()
 	_labels = &_settings.Labels
