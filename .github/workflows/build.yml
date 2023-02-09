@@ -74,7 +74,7 @@ jobs:
     - run: echo "done"
   
   create_app_release:
-    runs-on: "ubuntu-latest"
+    runs-on: "macos-latest"
     needs: [build_from_makefile, branch_name, semvar_tag]
     name: "Create releases"
     steps:     
@@ -98,5 +98,5 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: true
           files: |
-            ./builds/${{env.APP_NAME}}_darwin_amd64.app*
-            ./builds/${{env.APP_NAME}}_darwin_arm64.app*
+            **/*.app*
+            
