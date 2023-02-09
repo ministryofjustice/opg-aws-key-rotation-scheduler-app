@@ -91,7 +91,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.semvar_tag.outputs.tag }}
-          release_name: ${{ steps.semvar_tag.outputs.tag }}
           draft: false
           prerelease: true
           fail_on_unmatched_files: true
@@ -104,7 +103,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.semvar_tag.outputs.tag }}
-          release_name: ${{ steps.semvar_tag.outputs.tag }}
           draft: false
           prerelease: false
           fail_on_unmatched_files: true
