@@ -23,6 +23,10 @@ self: $(HOST_ARCH)
 	
 all: $(OS_AND_ARCHS_TO_BUILD)
 
+# this is to handle the intel macs that identify as x86_64
+# from uname, but golang treats that as amd64
+darwin_x86_64: requirements
+	@${MAKE} darwin_amd64
 
 darwin_arm64: requirements
 	@mkdir -p $(BUILD_FOLDER)$@/
