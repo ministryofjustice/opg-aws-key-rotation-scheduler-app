@@ -53,8 +53,9 @@ func (sh *Zsh) Supported() (supported bool) {
 
 // Self finds the system path for zsh bin
 func (sh *Zsh) Self() (path string, err error) {
-	defer debugger.Log("Zsh.Self()", debugger.INFO)()
-	return exec.LookPath(self)
+	path, err = exec.LookPath(self)
+	defer debugger.Log("Zsh.Self()", debugger.INFO, "path:\t"+path, "err:", err)()
+	return
 }
 
 // Profile tries to return command to load a profile
@@ -123,6 +124,6 @@ func (sh *Zsh) Run(args []string, withProfile bool) (stdout *strings.Builder, st
 		Stderr: stderr,
 	}
 	err = c.Run()
-	defer debugger.Log("Zsh.Run()", debugger.VERBOSE, "shell:", shell, "args:", cmdArgs, "err:", err)()
+	defer debugger.Log("Zsh.Run()", debugger.INFO, "shell:", shell, "args:", cmdArgs, "err:", err)()
 	return
 }
