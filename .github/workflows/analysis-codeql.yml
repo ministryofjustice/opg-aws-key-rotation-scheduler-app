@@ -1,0 +1,26 @@
+name: "[Analysis - SAST] CodeQL For Go"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+    paths: ["**.go"]
+permissions:
+  actions: read
+  checks: read
+  contents: none
+  deployments: none
+  issues: none
+  packages: none
+  pull-requests: write
+  repository-projects: none
+  security-events: none
+  statuses: none
+
+jobs:
+  codeql:
+    uses: ministryofjustice/opg-github-workflows/.github/workflows/analysis-application-codeql-sast-to-github-security.yml@main
+    with:
+      application_languages: '["go"]'
+    secrets:
+      github_token: ${{ secrets.GITHUB_TOKEN }}

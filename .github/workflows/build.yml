@@ -1,0 +1,108 @@
+name: "[Build] Create app and release"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  APP_NAME: "OPGAWSKeyRotation"
+  TAR: macos
+
+jobs:
+  branch_name:
+    name: Get branch name
+    uses: ministryofjustice/opg-github-workflows/.github/workflows/data-parse-branch-name.yml@main
+    secrets: inherit
+  semvar_tag:
+    needs: [branch_name]
+    name: "Get tag for (${{ needs.branch_name.outputs.parsed }})"
+    uses: ministryofjustice/opg-github-workflows/.github/workflows/data-parse-semvar-tag.yml@main
+    with:
+      branch_name: ${{ needs.branch_name.outputs.parsed }}
+    secrets: inherit
+
+  build_from_makefile:
+    needs: [branch_name, semvar_tag]
+    name: "Building"
+    runs-on: macos-12
+    strategy:
+      matrix:
+        target_architecture: ["darwin_arm64", "darwin_amd64"]
+    steps:   
+    - uses: actions/setup-go@v3
+      with:
+        go-version: '1.19'
+    - name: Setup $GOBIN and $PATH
+      run: |
+        export GOBIN="${HOME}/go/bin"
+        mkdir -p ${GOBIN}
+        echo "GOBIN=${GOBIN}" >> $GITHUB_ENV
+        echo "PATH=${PATH}:${GOBIN}" >> $GITHUB_ENV
+    - run: go install fyne.io/fyne/v2/cmd/fyne@v2.3.0
+    - name: Output env & var data
+      run: |
+        echo "== BRANCH =="
+        echo "Raw: ${{ needs.branch_name.outputs.raw }}"
+        echo "Parsed: ${{ needs.branch_name.outputs.parsed }}"
+        echo "Alphanumeric: ${{ needs.branch_name.outputs.alphanumeric }}"
+        echo "== SEMVAR =="
+        echo "Tag: ${{ needs.semvar_tag.outputs.tag }}"
+        echo "New Tag: ${{ needs.semvar_tag.outputs.new_tag }}"
+        echo "== GO =="
+        echo "version: $(go version)"        
+        echo "gobin: ${GOBIN}"
+        echo "fyne: $(fyne version)"
+        echo "== PATHING =="
+        echo "path: ${PATH}"
+        echo "bash $(which bash)"    
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: BUILD via makefile
+      run: make ${{ matrix.target_architecture }}
+    - name: Create tar ball of the app
+      run: |
+        cd ./builds/${{ matrix.target_architecture }}/
+        tar -czf ${{ matrix.target_architecture }}.tgz ${{ env.APP_NAME }}.app
+        ls -larthR 
+    - name: Upload application artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.target_architecture }}
+        path: ./builds/${{ matrix.target_architecture }}/${{ matrix.target_architecture }}.tgz
+    - run: echo "done"
+  
+  create_app_release:
+    runs-on: "macos-12"
+    needs: [build_from_makefile, branch_name, semvar_tag]
+    name: "Create releases"
+    steps:     
+      - run: mkdir -p ./builds/ ./release/
+      - name: Download artifacts from this workflow run
+        uses: actions/download-artifact@v3
+        with:
+          path: ./builds/      
+      - name: Move all tar files into ./release folder for release
+        run: |
+          cd ./builds/
+          find . -name '*.tgz' -exec sh -c 'mv "${0}" ../release/; ' {} \;
+      - name: Create release
+        if: ${{ needs.branch_name.outputs.parsed == 'main' }}
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.semvar_tag.outputs.tag }}
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          files: |
+            release/**
+            
