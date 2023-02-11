@@ -26,7 +26,6 @@ func UpdateMenu() {
 	if lockErr == nil && lock.Older(lockMaxAge) {
 		MenuOldLock()
 	}
-
 	// lock exists
 	if lockErr == nil {
 		MenuLocked()
@@ -89,6 +88,7 @@ func MenuRotate() {
 		tracker.Unlock()
 		// new reacker
 		track, _ = tracker.SetCurrent(tracker.Clean())
+
 		debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotated successfully", "new tracker:", track)()
 		menuInformation.Label = fmt.Sprintf(
 			labels.NextRotation,

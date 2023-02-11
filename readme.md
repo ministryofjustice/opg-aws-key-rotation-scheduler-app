@@ -27,7 +27,7 @@ The app itself has 3 states - default, rotating and locked - each of which show 
 
 You will be prompted for you key chain password and then for MFA codes for your AWS account. When these prompts occur you should see a visual change in the systray icon (generally orange) and the message state which `iam` role you are providing credintials for.
 
-While rotating your keys a lock file is created (`~/.opg/aws-key-rotation/locked.v0`) to act as a semaphore and block access / execution relating to key changes. 
+While rotating your keys a lock file is created (`~/.opg/aws-key-rotation/lock.v1`) to act as a semaphore and block access / execution relating to key changes. 
 
 While in this state the `Rotate now` menu item is also disabled.
 
@@ -35,11 +35,11 @@ While in this state the `Rotate now` menu item is also disabled.
 
 If the application crashes, is quit out or you select `cancel` option while entering key chain / MFA details the application will enter a locked state. The system tracy icon is visually different to show this (coloured red). 
 
-After an hour the lock file will be automatically removed and the key rotation process restarted, but if you wish to trigger this beforehand you can remove the lock file manually (`rm ~/.opg/aws-key-rotation/locked.v0`).
+After an hour the lock file will be automatically removed and the key rotation process restarted, but if you wish to trigger this beforehand you can remove the lock file manually (`rm ~/.opg/aws-key-rotation/lock.v1`).
 
 ### Default
 
-Every minute (this will be reduced after testing) the application checks the age of its tracking data (stored in a file at `~/.opg/aws-key-rotation/current.v0`) against the configured rotating interval.
+Every minute (this will be reduced after testing) the application checks the age of its tracking data (stored in a file at `~/.opg/aws-key-rotation/current.v1`) against the configured rotating interval.
 
 If it is older, then a rotation is triggered.
 
