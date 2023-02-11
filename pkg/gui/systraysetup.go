@@ -26,7 +26,7 @@ func SystraySetup() {
 	split := fyne.NewMenuItemSeparator()
 
 	menu = fyne.NewMenu(opgapp.AppName, menuRotate, split, menuInformation)
-	debugger.Log("SystraySetup", debugger.INFO, "generated menu")()
+	debugger.Log("gui.SystraySetup()", debugger.INFO, "generated menu")()
 
 	go func() {
 		for range time.Tick(tickDuration) {
