@@ -23,10 +23,12 @@ func errorMenu(app fyne.App) (menu *fyne.MainMenu) {
 
 func ErrorDialog(
 	app fyne.App,
+	window fyne.Window,
 	messages []string,
 ) fyne.Window {
 	debugger.Log("gui.ErrorDialog()", debugger.ERR, "Error messages", strings.Join(messages, "\n"))()
-	window := app.NewWindow(opgapp.AppName + " - Error!")
+
+	window.SetTitle(opgapp.AppName + ": Error")
 	window.SetMainMenu(errorMenu(app))
 
 	box := container.NewVBox()

@@ -36,6 +36,7 @@ var (
 	app         fyne.App
 	desktopApp  desktop.App
 	preferences fyne.Preferences
+	window      fyne.Window
 	zsh         shell.Shell
 	os          osinfo.OsInfo
 	prof        profile.Profile
@@ -46,6 +47,7 @@ var (
 func StartApp(
 	a fyne.App,
 	dApp desktop.App,
+	win fyne.Window,
 	pref fyne.Preferences,
 	sh shell.Shell,
 	o osinfo.OsInfo,
@@ -60,6 +62,7 @@ func StartApp(
 	app = a
 	desktopApp = dApp
 	preferences = pref
+	window = win
 	track = tr
 	isDark = isDarkMode
 	dateTimeFormat = format

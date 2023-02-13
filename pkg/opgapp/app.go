@@ -8,6 +8,7 @@ import (
 var (
 	App         fyne.App
 	Preferences fyne.Preferences
+	Window      fyne.Window
 )
 
 const (
@@ -18,4 +19,5 @@ const (
 func init() {
 	App = app.NewWithID(AppId)
 	Preferences = App.Preferences()
+	Window = App.NewWindow(AppName)
 }

@@ -16,24 +16,33 @@ import (
 
 var (
 	App         fyne.App
+	Window      fyne.Window
 	Desktop     desktop.App
-	Preferences *fyne.Preferences
-	Shell       shell.Shell     // System supported shell
-	Os          osinfo.OsInfo   // Details about the Os
-	Profile     profile.Profile // Profile is what will be used in the aws-vault call
-	Vault       vault.Vault
-	Track       tracker.Track
+	Preferences fyne.Preferences
+
+	Shell   shell.Shell     // System supported shell
+	Os      osinfo.OsInfo   // Details about the Os
+	Profile profile.Profile // Profile is what will be used in the aws-vault call
+	Vault   vault.Vault
+	Track   tracker.Track
 
 	DarkMode  bool
 	IsDesktop bool
 
 	supportErrors []string = []string{}
+
+	dateTimePreferencesKey string = "date_time_format"
+	dateTimeFormat         string = ""
+	dateTimeFormatFallback string = "02-Jan-2006 15:04"
 )
 
-const (
-	dateTimeFormat string = "02-Jan-2006 15:04"
-)
-
+// supported checks that all requirements for this app are met
+// and returned a slice of error messages for anything that is not
+// Checks:
+//   - OS support (darwin)
+//   - Shell support (zsh)
+//   - Profile (aws profile installed, identity configured, region set on identity)
+//   - Vault (aws vault found within $shell)
 func supported() (errs []string) {
 	if !Os.Supported() {
 		errs = append(errs, errors.UnsupportedOs)
@@ -63,7 +72,8 @@ func supported() (errs []string) {
 func main() {
 	// main app
 	App = opgapp.App
-	Preferences = &opgapp.Preferences
+	Preferences = opgapp.Preferences
+	Window = opgapp.Window
 	// os / config items
 	Shell = shell.New()
 	Os = osinfo.New()
@@ -71,7 +81,8 @@ func main() {
 	Vault = vault.New()
 	// key tracker
 	Track = tracker.New()
-
+	// get the datetime format
+	dateTimeFormat = Preferences.StringWithFallback(dateTimePreferencesKey, dateTimeFormatFallback)
 	// check for support
 	supportErrors = supported()
 	Desktop, IsDesktop = App.(desktop.App)
@@ -80,14 +91,15 @@ func main() {
 	}
 
 	if len(supportErrors) > 0 {
-		window := gui.ErrorDialog(App, supportErrors)
+		window := gui.ErrorDialog(App, Window, supportErrors)
 		window.ShowAndRun()
 	} else {
 		DarkMode = Os.DarkMode(Shell)
 		gui.StartApp(
 			App,
 			Desktop,
-			*Preferences,
+			Window,
+			Preferences,
 			Shell,
 			Os,
 			Profile,
