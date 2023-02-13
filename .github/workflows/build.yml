@@ -13,7 +13,6 @@ defaults:
 
 env:
   APP_NAME: "OPGAWSKeyRotation"
-  TAR: macos
 
 jobs:
   branch_name:
@@ -29,8 +28,8 @@ jobs:
       with:
         fetch-depth: '0'
     - name: Tag
-      uses: anothrNick/github-tag-action@1.36.0
-      with:
+      uses: anothrNick/github-tag-action@1.61.0
+      env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         INITIAL_VERSION: 0.0.0
         DEFAULT_BUMP: minor
