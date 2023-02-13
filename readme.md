@@ -73,3 +73,18 @@ The `Makefile` will attempt to resolve these for you within the `requirements` t
 To create an app for your macOs version, from the root of the directory run `make` and check the content of the `./builds/` folder.
 
 If you want to create application for all supported architectures, use `make all`
+
+
+## Overrides
+
+You can overwrite certain features of the application using environment variables rather than rebuilding the whole application:
+
+Enable debug:
+```
+export OPGAWSKEYROTATION_DEBUG="1"
+```
+
+Change rotation frequency:
+```
+export OPGAWSKEYROTATION_TRACKER_LIFETIME=2m
+```
