@@ -1,9 +1,11 @@
 package main
 
 import (
+	"opg-aws-key-rotation-scheduler-app/pkg/cfg"
+	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"opg-aws-key-rotation-scheduler-app/pkg/errors"
 	"opg-aws-key-rotation-scheduler-app/pkg/gui"
-	. "opg-aws-key-rotation-scheduler-app/pkg/opgapp"
+	"opg-aws-key-rotation-scheduler-app/pkg/pref"
 	"opg-aws-key-rotation-scheduler-app/pkg/storage"
 	"opg-aws-key-rotation-scheduler-app/pkg/tracker"
 	"os"
@@ -34,15 +36,15 @@ func profiling() (cpuFile *os.File, memoryFile *os.File) {
 //   - Profile (aws profile installed, identity configured, region set on identity)
 //   - Vault (aws vault found within $shell)
 func supported() (errs []string) {
-	if !Os.Supported() {
+	if !cfg.Os.Supported() {
 		errs = append(errs, errors.UnsupportedOs)
 	}
-	if !Shell.Supported() {
+	if !cfg.Shell.Supported() {
 		errs = append(errs, errors.UnsupportedShell)
 	}
 
 	if len(errs) == 0 {
-		p, pf, rs := Profile.Supported(Shell)
+		p, pf, rs := cfg.Profile.Supported(cfg.Shell)
 		if !p {
 			errs = append(errs, errors.ProfileCLINotFound)
 		}
@@ -52,32 +54,43 @@ func supported() (errs []string) {
 		if !rs {
 			errs = append(errs, errors.RegionNotSet)
 		}
-		if !Vault.Supported(Shell) {
+		if !cfg.Vault.Supported(cfg.Shell) {
 			errs = append(errs, errors.VaultNotFound)
 		}
 	}
 	return
 }
 
+func init() {
+	// config the preferences data with info from cfg
+	pref.PREFERENCES = pref.New(cfg.AppName, cfg.Preferences)
+
+}
+
 func main() {
-	if PROFILING {
+	// turn on debug
+	if pref.PREFERENCES.Debug.Get() {
+		debugger.LEVEL = debugger.ALL
+	}
+	if pref.PREFERENCES.CpuProfiling.Get() {
 		cpuF, _ := profiling()
 		pprof.StartCPUProfile(cpuF)
 		defer pprof.StopCPUProfile()
 	}
+
 	// key tracker - down outside of app to avoid cyclic imports
 	Track = tracker.New()
 	// check for support
 	supportErrors = supported()
-	if !IsDesktop {
+	if !cfg.IsDesktop {
 		supportErrors = append(supportErrors, errors.IsNotDesktop)
 	}
 
 	if len(supportErrors) > 0 {
-		window := gui.ErrorDialog(App, Window, supportErrors)
+		window := gui.ErrorDialog(cfg.App, cfg.Window, supportErrors)
 		window.ShowAndRun()
 	} else {
-		IsDarkMode = Os.DarkMode(Shell)
+		cfg.IsDarkMode = cfg.Os.DarkMode(cfg.Shell)
 		gui.StartApp(Track)
 	}
 

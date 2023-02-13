@@ -75,36 +75,41 @@ To create an app for your macOs version, from the root of the directory run `mak
 If you want to create application for all supported architectures, use `make all`
 
 
-## Overrides
+## Enable Debug
 
-You can overwrite certain features of the application using environment variables rather than rebuilding the whole application:
+You can enabled debug by setting an environment variable which will be checked at run time:
 
-Enable debug:
 ```sh
-export OPGAWSKEYROTATION_DEBUG="1"
+export OPGAWSKeyRotation_debug="true"
 ```
 
-Enable CPU profiling:
+This will turn on most verbose level of logging
+
+## Enable CPU Profiling
+
+The app can generate a `cpu.prof` file in its own directory to run with `go tool pprof`. To do this, change the relevant environment variable:
+
 ```sh
-export OPGAWSKEYROTATION_PROFILE="1"
+export OPGAWSKeyRotation_cpu_profiling="true"
 ```
 
-Change rotation frequency:
-```sh
-export OPGAWSKEYROTATION_TRACKER_LIFETIME=2m
-```
+You can then review the data using 
 
-
-## CPU Profiling
-
-When enbabled (via env var `OPGAWSKEYROTATION_PROFILE`) the application will genrate a cpu profile file that can then be check with `pprof`. This file is stored in the same folder as executable.
-
-To run the app with profiling (based on running from this repositories directory):
-```sh
-export OPGAWSKEYROTATION_PROFILE="1"; go run main.go
-```
-
-To review the profile:
 ```sh
 go tool pprof ${EXECUTABLE_NAME} cpu.prof
 ```
+
+## Preference overrides
+
+A varity of settings are configurable by settings environment variables, they are detailed below:
+
+- `OPGAWSKeyRotation_debug` - enables full logging when set to `"true"`
+- `OPGAWSKeyRotation_cpu_profiling` - enables cpu profiling when set to `"true"`
+- `OPGAWSKeyRotation_rotation_frequency` - controls how often the keys should be rotated. Supports `go time.Duration` format (default: `"24h"`)
+- `OPGAWSKeyRotation_profile_cli_tool` - set the name of the aws cli tool (default: `aws`)
+- `OPGAWSKeyRotation_profile_name` - set the name of the aws profile to be used (default: `identity`)
+- `OPGAWSKeyRotation_vault_tool` - set the name of the vault cli tool (default: `aws-vault`)
+- `OPGAWSKeyRotation_tick` - set the how frequently the age of the key is checked. Supports `go time.Duration` format. (default: `"1m"`)
+- `OPGAWSKeyRotation_lock_max_age` - set the max age of a lockfile before removal. Supports `go time.Duration` format. (default: `"5m"`)
+- `OPGAWSKeyRotation_date_time_format` - set how the next rotation date is shown. (default: `"02-Jan-2006 15:04"`)
+

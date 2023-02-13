@@ -2,10 +2,10 @@ package gui
 
 import (
 	"fmt"
+	"opg-aws-key-rotation-scheduler-app/pkg/cfg"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"opg-aws-key-rotation-scheduler-app/pkg/icons"
 	"opg-aws-key-rotation-scheduler-app/pkg/labels"
-	. "opg-aws-key-rotation-scheduler-app/pkg/opgapp"
 	"opg-aws-key-rotation-scheduler-app/pkg/tracker"
 	"strconv"
 	"time"
@@ -24,7 +24,7 @@ func UpdateMenu() {
 		"now:\t\t"+now.String(),
 		"rotateAt:\t"+at.String(),
 		"valid:\t\t"+strconv.FormatBool(valid),
-		"booting:\t"+strconv.FormatBool(Booting))()
+		"booting:\t"+strconv.FormatBool(cfg.IsBooting))()
 
 	mu.Lock()
 
@@ -35,9 +35,9 @@ func UpdateMenu() {
 	// lock exists
 	if lockErr == nil {
 		MenuLocked()
-	} else if !valid && !Booting {
+	} else if !valid && !cfg.IsBooting {
 		MenuRotate()
-	} else if !valid && Booting {
+	} else if !valid && cfg.IsBooting {
 		MenuRotatingSoon()
 	} else {
 		menuInformation.Label = fmt.Sprintf(
@@ -64,13 +64,13 @@ func MenuLocked() {
 	defer debugger.Log("gui.MenuLocked()", debugger.INFO, "Key is locked...")()
 	menuRotate.Disabled = false
 	menuInformation.Label = labels.Locked
-	Desktop.SetSystemTrayIcon(icons.Locked(IsDarkMode))
+	cfg.Desktop.SetSystemTrayIcon(icons.Locked(cfg.IsDarkMode))
 	menu.Refresh()
 }
 
 func MenuRotatingSoon() {
 	defer debugger.Log("gui.MenuWillRotate()", debugger.INFO, "Key will be rotated, show warning")()
-	Desktop.SetSystemTrayIcon(icons.RotatingSoon(IsDarkMode))
+	cfg.Desktop.SetSystemTrayIcon(icons.RotatingSoon(cfg.IsDarkMode))
 	menuInformation.Label = labels.Rotating
 	menu.Refresh()
 }
@@ -81,13 +81,13 @@ func MenuRotate() {
 	debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotating key...")()
 	tracker.SetLock(Track)
 
-	Desktop.SetSystemTrayIcon(icons.Rotating(IsDarkMode))
+	cfg.Desktop.SetSystemTrayIcon(icons.Rotating(cfg.IsDarkMode))
 	menuInformation.Label = labels.Rotating
 	menuRotate.Disabled = true
 	menu.Refresh()
 
-	command := Vault.Command(Profile, Os)
-	sOut, sErr, err := Shell.Run([]string{command}, false)
+	command := cfg.Vault.Command(cfg.Profile, cfg.Os)
+	sOut, sErr, err := cfg.Shell.Run([]string{command}, false)
 
 	debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotate command finished", "stdOut:", sOut, "stdErr:", sErr)()
 	if err == nil {
@@ -101,12 +101,12 @@ func MenuRotate() {
 			Track.ExpiresAt().Format(dateTimeFormat),
 		)
 		menuRotate.Disabled = false
-		Desktop.SetSystemTrayIcon(icons.Default(IsDarkMode))
+		cfg.Desktop.SetSystemTrayIcon(icons.Default(cfg.IsDarkMode))
 
 	} else {
 		debugger.Log("gui.MenuRotate()", debugger.ERR, "Rotate failed", "err:", err, "stdErr:", sErr.String())()
-		Window = ErrorDialog(App, Window, []string{sErr.String(), err.Error()})
-		Window.Show()
+		cfg.Window = ErrorDialog(cfg.App, cfg.Window, []string{sErr.String(), err.Error()})
+		cfg.Window.Show()
 		MenuLocked()
 	}
 	menu.Refresh()

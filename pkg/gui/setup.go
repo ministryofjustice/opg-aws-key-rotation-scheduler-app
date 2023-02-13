@@ -1,8 +1,9 @@
 package gui
 
 import (
+	"opg-aws-key-rotation-scheduler-app/pkg/cfg"
 	"opg-aws-key-rotation-scheduler-app/pkg/icons"
-	. "opg-aws-key-rotation-scheduler-app/pkg/opgapp"
+	"opg-aws-key-rotation-scheduler-app/pkg/pref"
 	"opg-aws-key-rotation-scheduler-app/pkg/tracker"
 	"sync"
 	"time"
@@ -20,21 +21,11 @@ var (
 	menu            *fyne.Menu
 )
 
-// items handled by preferences
+// preference based settings
 var (
-	// ticks - how often we check status of track
-	tickDurationPreferencesKey string = "check_frequency"
-	tickDurationFallback       string = "1m"
-	tickDuration               time.Duration
-
-	lockMaxAgePreferencesKey string = "lock_max_age"
-	lockMaxAgeFallback       string = "10m"
-	lockMaxAge               time.Duration
-
-	// date time formats
-	dateTimePreferencesKey string = "date_time_format"
-	dateTimeFormatFallback string = "02-Jan-2006 15:04"
-	dateTimeFormat         string = ""
+	tickDuration   time.Duration
+	lockMaxAge     time.Duration
+	dateTimeFormat string = ""
 )
 
 var (
@@ -51,27 +42,25 @@ func StartApp(tr tracker.Track) {
 
 	// get preferences
 	// - times
-	dateTimeFormat = Preferences.StringWithFallback(dateTimePreferencesKey, dateTimeFormatFallback)
+	dateTimeFormat = pref.PREFERENCES.DateTimeFormat.Get()
 	// - ticks
-	tickDurStr := Preferences.StringWithFallback(tickDurationPreferencesKey, tickDurationFallback)
-	tickDuration, _ = time.ParseDuration(tickDurStr)
+	tickDuration = pref.PREFERENCES.Tick.Get()
 	// - locks
-	lockStr := Preferences.StringWithFallback(lockMaxAgePreferencesKey, lockMaxAgeFallback)
-	lockMaxAge, _ = time.ParseDuration(lockStr)
+	lockMaxAge = pref.PREFERENCES.LockMaxAge.Get()
 
 	// setup the app tray
 	SystraySetup()
-	Desktop.SetSystemTrayMenu(menu)
-	Desktop.SetSystemTrayIcon(icons.Default(IsDarkMode))
+	cfg.Desktop.SetSystemTrayMenu(menu)
+	cfg.Desktop.SetSystemTrayIcon(icons.Default(cfg.IsDarkMode))
 
 	UpdateMenu()
 	// trigger the activation policy to remove the docker icon etc
-	App.Lifecycle().SetOnStarted(func() {
+	cfg.App.Lifecycle().SetOnStarted(func() {
 		go func() {
 			time.Sleep(200 * time.Millisecond)
 			setActivationPolicy()
 		}()
 	})
 
-	App.Run()
+	cfg.App.Run()
 }
