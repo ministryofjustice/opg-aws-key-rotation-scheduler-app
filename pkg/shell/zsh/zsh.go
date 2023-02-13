@@ -26,7 +26,23 @@ const (
 	ERR_NO_PROFILE string = "no user profiles found"
 )
 
-type Zsh struct{}
+// -- main shell
+type Zsh struct {
+	self string
+}
+
+// Self finds the system path for zsh bin
+func (sh *Zsh) Self() (path string, err error) {
+	if len(sh.self) == 0 {
+		path, err = exec.LookPath(self)
+		sh.self = path
+		defer debugger.Log("Zsh.Self()", debugger.INFO, "path:\t"+path, "err:", err)()
+	} else {
+		path = sh.self
+		defer debugger.Log("Zsh.Self()", debugger.INFO, "[cached]", "path:\t"+path, "err:", err)()
+	}
+	return
+}
 
 // profile is internal and looks for possible user profile files
 // as they might be in various locations
@@ -49,13 +65,6 @@ func (sh *Zsh) Supported() (supported bool) {
 	defer debugger.Log("Zsh.Supported()", debugger.INFO, supported)()
 	return
 
-}
-
-// Self finds the system path for zsh bin
-func (sh *Zsh) Self() (path string, err error) {
-	path, err = exec.LookPath(self)
-	defer debugger.Log("Zsh.Self()", debugger.INFO, "path:\t"+path, "err:", err)()
-	return
 }
 
 // Profile tries to return command to load a profile
@@ -117,13 +126,22 @@ func (sh *Zsh) Run(args []string, withProfile bool) (stdout *strings.Builder, st
 	}
 	cmdArgs = append(cmdArgs, args...)
 
-	c := &exec.Cmd{
-		Path:   shell,
-		Args:   cmdArgs,
-		Stdout: stdout,
-		Stderr: stderr,
+	if cached, found := fromCache(shell, cmdArgs); found {
+		stdout = cached.Stdout
+		stderr = cached.Stderr
+		err = cached.Err
+		defer debugger.Log("Zsh.Run()", debugger.INFO, "[cached]", "shell:", shell, "args:", cmdArgs, "err:", err)()
+	} else {
+		c := &exec.Cmd{
+			Path:   shell,
+			Args:   cmdArgs,
+			Stdout: stdout,
+			Stderr: stderr,
+		}
+		err = c.Run()
+		defer debugger.Log("Zsh.Run()", debugger.INFO, "shell:", shell, "args:", cmdArgs, "err:", err)()
+		defer toCache(shell, cmdArgs, stdout, stderr, err)
 	}
-	err = c.Run()
-	defer debugger.Log("Zsh.Run()", debugger.INFO, "shell:", shell, "args:", cmdArgs, "err:", err)()
+
 	return
 }
