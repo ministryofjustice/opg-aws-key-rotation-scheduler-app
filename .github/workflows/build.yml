@@ -23,11 +23,15 @@ jobs:
   semvar_tag:
     needs: [branch_name]
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.bump_version.outputs.tag }}
+      new_tag: ${{ steps.bump_version.outputs.new_tag }}
     steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: '0'
     - name: Tag
+      id: bump_version
       uses: anothrNick/github-tag-action@1.61.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,7 +41,6 @@ jobs:
         RELEASE_BRANCHES: main
         WITH_V: true
     
-
   build_from_makefile:
     needs: [branch_name, semvar_tag]
     name: "Building"
