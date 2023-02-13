@@ -20,13 +20,25 @@ jobs:
     name: Get branch name
     uses: ministryofjustice/opg-github-workflows/.github/workflows/data-parse-branch-name.yml@main
     secrets: inherit
+
   semvar_tag:
     needs: [branch_name]
-    name: "Get tag for (${{ needs.branch_name.outputs.parsed }})"
-    uses: ministryofjustice/opg-github-workflows/.github/workflows/data-parse-semvar-tag.yml@main
-    with:
-      branch_name: ${{ needs.branch_name.outputs.parsed }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: '0'
+    - name: Tag
+      uses: anothrNick/github-tag-action@1.61.0
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        INITIAL_VERSION: 0.8.0
+        DEFAULT_BUMP: minor
+        BRANCH_HISTORY: full
+        PRERELEASE_SUFFIX: ${{ need.branch_name.parsed_branch }}
+        RELEASE_BRANCHES: main
+        WITH_V: true
+    
 
   build_from_makefile:
     needs: [branch_name, semvar_tag]
