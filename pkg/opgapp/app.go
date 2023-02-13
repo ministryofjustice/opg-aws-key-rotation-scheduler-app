@@ -39,6 +39,7 @@ var (
 	IsDarkMode bool = false
 	IsDesktop  bool = false
 	DEBUG      bool = true
+	PROFILING  bool = false
 )
 
 // debug preferences
@@ -48,6 +49,11 @@ const (
 	debugLevelPreferencesKey string = "debugger_level"
 	debugLevelFallback       int    = debugger.DETAILED
 	debugEnvVarName          string = "OPGAWSKEYROTATION_DEBUG"
+)
+
+// profiling preferences
+const (
+	profileEnvVarName string = "OPGAWSKEYROTATION_PROFILE"
 )
 
 func debugSetup() {
@@ -77,4 +83,8 @@ func init() {
 	Vault = vault.New()
 
 	debugSetup()
+
+	if envVar := os.Getenv(profileEnvVarName); len(envVar) > 0 {
+		PROFILING = true
+	}
 }

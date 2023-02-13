@@ -2,3 +2,4 @@ builds/**
 fyne-cross/**
 apps/**
 main
+**.prof

@@ -9,6 +9,7 @@ import (
 var (
 	UserHome              string
 	storageDirectory      string
+	perfProfileDirectory  string
 	StoragePermissionMode fs.FileMode = 0755
 )
 
@@ -20,6 +21,11 @@ func init() {
 	// directory storage
 	UserHome, _ := os.UserHomeDir()
 	storageDirectory = filepath.Join(UserHome, path)
+}
+
+func ProfileDirectory() string {
+	perfProfileDirectory, _ = os.Getwd()
+	return perfProfileDirectory
 }
 
 func StorageDirectory() string {

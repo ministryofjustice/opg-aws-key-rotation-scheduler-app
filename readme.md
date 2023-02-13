@@ -47,12 +47,12 @@ If it is older, then a rotation is triggered.
 # Setup for local development / build
 
 Clone the repository to you local drive and from the root directory run:
-```
+```sh
 make
 ```
 
 If successful, an application will be created at:
-```
+```sh
 ./builds/darwin_${ARCH}/
 ```
 Where `${ARCH}` is either `amd64` or `arm64`.
@@ -80,11 +80,31 @@ If you want to create application for all supported architectures, use `make all
 You can overwrite certain features of the application using environment variables rather than rebuilding the whole application:
 
 Enable debug:
-```
+```sh
 export OPGAWSKEYROTATION_DEBUG="1"
 ```
 
-Change rotation frequency:
+Enable CPU profiling:
+```sh
+export OPGAWSKEYROTATION_PROFILE="1"
 ```
+
+Change rotation frequency:
+```sh
 export OPGAWSKEYROTATION_TRACKER_LIFETIME=2m
+```
+
+
+## CPU Profiling
+
+When enbabled (via env var `OPGAWSKEYROTATION_PROFILE`) the application will genrate a cpu profile file that can then be check with `pprof`. This file is stored in the same folder as executable.
+
+To run the app with profiling (based on running from this repositories directory):
+```sh
+export OPGAWSKEYROTATION_PROFILE="1"; go run main.go
+```
+
+To review the profile:
+```sh
+go tool pprof ${EXECUTABLE_NAME} cpu.prof
 ```
