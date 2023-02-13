@@ -5,6 +5,7 @@ import (
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"opg-aws-key-rotation-scheduler-app/pkg/icons"
 	"opg-aws-key-rotation-scheduler-app/pkg/labels"
+	. "opg-aws-key-rotation-scheduler-app/pkg/opgapp"
 	"opg-aws-key-rotation-scheduler-app/pkg/tracker"
 	"strconv"
 	"time"
@@ -14,11 +15,16 @@ import (
 // of access key, trigger gui updates and funcs to update the key
 func UpdateMenu() {
 	now := time.Now().UTC()
-	at := track.ExpiresAt()
-	valid := track.Valid()
+	at := Track.ExpiresAt()
+	valid := Track.Valid()
 	lock, lockErr := tracker.GetLock()
 
-	debugger.Log("gui.UpdateMenu()", debugger.INFO, "now:\t\t"+now.String(), "rotateAt:\t"+at.String(), "valid:\t\t"+strconv.FormatBool(valid), "booting:\t"+strconv.FormatBool(booting))()
+	debugger.Log("gui.UpdateMenu()",
+		debugger.INFO,
+		"now:\t\t"+now.String(),
+		"rotateAt:\t"+at.String(),
+		"valid:\t\t"+strconv.FormatBool(valid),
+		"booting:\t"+strconv.FormatBool(Booting))()
 
 	mu.Lock()
 
@@ -29,14 +35,14 @@ func UpdateMenu() {
 	// lock exists
 	if lockErr == nil {
 		MenuLocked()
-	} else if !valid && !booting {
+	} else if !valid && !Booting {
 		MenuRotate()
-	} else if !valid && booting {
+	} else if !valid && Booting {
 		MenuRotatingSoon()
 	} else {
 		menuInformation.Label = fmt.Sprintf(
 			labels.NextRotation,
-			track.ExpiresAt().Format(dateTimeFormat),
+			Track.ExpiresAt().Format(dateTimeFormat),
 		)
 	}
 	menu.Refresh()
@@ -58,13 +64,13 @@ func MenuLocked() {
 	defer debugger.Log("gui.MenuLocked()", debugger.INFO, "Key is locked...")()
 	menuRotate.Disabled = false
 	menuInformation.Label = labels.Locked
-	desktopApp.SetSystemTrayIcon(icons.Locked(isDark))
+	Desktop.SetSystemTrayIcon(icons.Locked(IsDarkMode))
 	menu.Refresh()
 }
 
 func MenuRotatingSoon() {
 	defer debugger.Log("gui.MenuWillRotate()", debugger.INFO, "Key will be rotated, show warning")()
-	desktopApp.SetSystemTrayIcon(icons.RotatingSoon(isDark))
+	Desktop.SetSystemTrayIcon(icons.RotatingSoon(IsDarkMode))
 	menuInformation.Label = labels.Rotating
 	menu.Refresh()
 }
@@ -73,34 +79,34 @@ func MenuRotatingSoon() {
 // a key and show the status of that change
 func MenuRotate() {
 	debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotating key...")()
-	tracker.SetLock(track)
+	tracker.SetLock(Track)
 
-	desktopApp.SetSystemTrayIcon(icons.Rotating(isDark))
+	Desktop.SetSystemTrayIcon(icons.Rotating(IsDarkMode))
 	menuInformation.Label = labels.Rotating
 	menuRotate.Disabled = true
 	menu.Refresh()
 
-	command := awsVault.Command(prof, os)
-	sOut, sErr, err := zsh.Run([]string{command}, false)
+	command := Vault.Command(Profile, Os)
+	sOut, sErr, err := Shell.Run([]string{command}, false)
 
 	debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotate command finished", "stdOut:", sOut, "stdErr:", sErr)()
 	if err == nil {
 		tracker.Unlock()
 		// new reacker
-		track, _ = tracker.SetCurrent(tracker.Clean())
+		Track, _ = tracker.SetCurrent(tracker.Clean())
 
-		debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotated successfully", "new tracker:", track)()
+		debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotated successfully", "new tracker:", Track)()
 		menuInformation.Label = fmt.Sprintf(
 			labels.NextRotation,
-			track.ExpiresAt().Format(dateTimeFormat),
+			Track.ExpiresAt().Format(dateTimeFormat),
 		)
 		menuRotate.Disabled = false
-		desktopApp.SetSystemTrayIcon(icons.Default(isDark))
+		Desktop.SetSystemTrayIcon(icons.Default(IsDarkMode))
 
 	} else {
 		debugger.Log("gui.MenuRotate()", debugger.ERR, "Rotate failed", "err:", err, "stdErr:", sErr.String())()
-		window = ErrorDialog(app, window, []string{sErr.String(), err.Error()})
-		window.Show()
+		Window = ErrorDialog(App, Window, []string{sErr.String(), err.Error()})
+		Window.Show()
 		MenuLocked()
 	}
 	menu.Refresh()

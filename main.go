@@ -3,37 +3,13 @@ package main
 import (
 	"opg-aws-key-rotation-scheduler-app/pkg/errors"
 	"opg-aws-key-rotation-scheduler-app/pkg/gui"
-	"opg-aws-key-rotation-scheduler-app/pkg/opgapp"
-	"opg-aws-key-rotation-scheduler-app/pkg/osinfo"
-	"opg-aws-key-rotation-scheduler-app/pkg/profile"
-	"opg-aws-key-rotation-scheduler-app/pkg/shell"
+	. "opg-aws-key-rotation-scheduler-app/pkg/opgapp"
 	"opg-aws-key-rotation-scheduler-app/pkg/tracker"
-	"opg-aws-key-rotation-scheduler-app/pkg/vault"
-
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/driver/desktop"
 )
 
 var (
-	App         fyne.App
-	Window      fyne.Window
-	Desktop     desktop.App
-	Preferences fyne.Preferences
-
-	Shell   shell.Shell     // System supported shell
-	Os      osinfo.OsInfo   // Details about the Os
-	Profile profile.Profile // Profile is what will be used in the aws-vault call
-	Vault   vault.Vault
-	Track   tracker.Track
-
-	DarkMode  bool
-	IsDesktop bool
-
+	Track         tracker.Track
 	supportErrors []string = []string{}
-
-	dateTimePreferencesKey string = "date_time_format"
-	dateTimeFormat         string = ""
-	dateTimeFormatFallback string = "02-Jan-2006 15:04"
 )
 
 // supported checks that all requirements for this app are met
@@ -70,22 +46,10 @@ func supported() (errs []string) {
 }
 
 func main() {
-	// main app
-	App = opgapp.App
-	Preferences = opgapp.Preferences
-	Window = opgapp.Window
-	// os / config items
-	Shell = shell.New()
-	Os = osinfo.New()
-	Profile = profile.New()
-	Vault = vault.New()
-	// key tracker
+	// key tracker - down outside of app to avoid cyclic imports
 	Track = tracker.New()
-	// get the datetime format
-	dateTimeFormat = Preferences.StringWithFallback(dateTimePreferencesKey, dateTimeFormatFallback)
 	// check for support
 	supportErrors = supported()
-	Desktop, IsDesktop = App.(desktop.App)
 	if !IsDesktop {
 		supportErrors = append(supportErrors, errors.IsNotDesktop)
 	}
@@ -94,19 +58,8 @@ func main() {
 		window := gui.ErrorDialog(App, Window, supportErrors)
 		window.ShowAndRun()
 	} else {
-		DarkMode = Os.DarkMode(Shell)
-		gui.StartApp(
-			App,
-			Desktop,
-			Window,
-			Preferences,
-			Shell,
-			Os,
-			Profile,
-			Track,
-			Vault,
-			DarkMode,
-			dateTimeFormat)
+		IsDarkMode = Os.DarkMode(Shell)
+		gui.StartApp(Track)
 	}
 
 }
