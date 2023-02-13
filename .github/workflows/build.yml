@@ -32,9 +32,7 @@ jobs:
       uses: anothrNick/github-tag-action@1.61.0
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        INITIAL_VERSION: 0.8.0
         DEFAULT_BUMP: minor
-        BRANCH_HISTORY: full
         PRERELEASE_SUFFIX: ${{ needs.branch_name.parsed_branch }}
         RELEASE_BRANCHES: main
         WITH_V: true
