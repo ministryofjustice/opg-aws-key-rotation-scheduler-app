@@ -2,8 +2,8 @@ package gui
 
 import (
 	"image/color"
+	"opg-aws-key-rotation-scheduler-app/pkg/cfg"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
-	"opg-aws-key-rotation-scheduler-app/pkg/opgapp"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -28,7 +28,7 @@ func ErrorDialog(
 ) fyne.Window {
 	debugger.Log("gui.ErrorDialog()", debugger.ERR, "Error messages", strings.Join(messages, "\n"))()
 
-	window.SetTitle(opgapp.AppName + ": Error")
+	window.SetTitle(cfg.AppName + ": Error")
 	window.SetMainMenu(errorMenu(app))
 
 	box := container.NewVBox()

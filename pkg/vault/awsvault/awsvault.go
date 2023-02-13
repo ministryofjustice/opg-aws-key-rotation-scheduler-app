@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"opg-aws-key-rotation-scheduler-app/pkg/osinfo"
+	"opg-aws-key-rotation-scheduler-app/pkg/pref"
 	"opg-aws-key-rotation-scheduler-app/pkg/profile"
 	"opg-aws-key-rotation-scheduler-app/pkg/shell"
 	"strconv"
 )
 
 const (
-	command string = "aws-vault"
-	rotate  string = "%s rotate %s --prompt=%s"
+	rotate string = "%s rotate %s --prompt=%s"
 )
 
 var (
@@ -21,6 +21,7 @@ var (
 type AwsVault struct{}
 
 func (v *AwsVault) Supported(sh shell.Shell) (supported bool) {
+	command := pref.PREFERENCES.VaultTool.Get()
 	p, _, _, err := sh.Search(command, true)
 	supported = (err == nil)
 	if supported {

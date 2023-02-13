@@ -2,9 +2,9 @@ package gui
 
 import (
 	"fmt"
+	"opg-aws-key-rotation-scheduler-app/pkg/cfg"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"opg-aws-key-rotation-scheduler-app/pkg/labels"
-	. "opg-aws-key-rotation-scheduler-app/pkg/opgapp"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -25,12 +25,12 @@ func SystraySetup() {
 
 	split := fyne.NewMenuItemSeparator()
 
-	menu = fyne.NewMenu(AppName, menuRotate, split, menuInformation)
+	menu = fyne.NewMenu(cfg.AppName, menuRotate, split, menuInformation)
 	debugger.Log("gui.SystraySetup()", debugger.INFO, "generated menu")()
 
 	go func() {
 		for range time.Tick(tickDuration) {
-			Booting = false
+			cfg.IsBooting = false
 			debugger.Log("tick", debugger.INFO)()
 			UpdateMenu()
 		}

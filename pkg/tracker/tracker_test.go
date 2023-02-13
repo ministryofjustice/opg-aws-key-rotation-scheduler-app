@@ -1,16 +1,23 @@
 package tracker
 
 import (
+	"opg-aws-key-rotation-scheduler-app/pkg/pref"
 	"testing"
 	"time"
+
+	"fyne.io/fyne/v2/app"
 )
 
 func TestNewTracker(t *testing.T) {
+	a := app.NewWithID("test-app")
+	p := a.Preferences()
+	pref.PREFERENCES = pref.New("test-app", p)
+
 	// replace the file
 	SetCurrent(Clean())
 
 	tr := New()
-	if tr.Lifetime != rotationFallbackLifetime {
+	if tr.Lifetime != pref.Fbs["rotation_frequency"] {
 		t.Errorf("lifetime error: %v", tr)
 	}
 
@@ -24,9 +31,9 @@ func TestNewTracker(t *testing.T) {
 
 func TestExpiresAt(t *testing.T) {
 	now := time.Now().UTC()
-	d, _ := time.ParseDuration(rotationFallbackLifetime)
+	d, _ := time.ParseDuration(pref.Fbs["rotation_frequency"])
 	expected := now.Add(d)
-	tr := Track{Timestamp: now, Lifetime: rotationFallbackLifetime}
+	tr := Track{Timestamp: now, Lifetime: pref.Fbs["rotation_frequency"]}
 
 	if tr.ExpiresAt() != expected {
 		t.Errorf("expiry does not matched, expected [%v], actual [%v]", expected, tr.ExpiresAt())
@@ -35,10 +42,10 @@ func TestExpiresAt(t *testing.T) {
 }
 
 func TestValid(t *testing.T) {
-	d, _ := time.ParseDuration(rotationFallbackLifetime)
-	now := time.Now().UTC().Add(2 * d)
+	d, _ := time.ParseDuration(pref.Fbs["rotation_frequency"])
+	ts := time.Now().UTC().Add(-2 * d)
 
-	tr := Track{Timestamp: now, Lifetime: rotationFallbackLifetime}
+	tr := Track{Timestamp: ts, Lifetime: pref.Fbs["rotation_frequency"]}
 
 	if tr.Valid() {
 		t.Errorf("should be expired, actual [%v]", tr.Valid())

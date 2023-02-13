@@ -3,7 +3,7 @@ package tracker
 import (
 	"encoding/json"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
-	"opg-aws-key-rotation-scheduler-app/pkg/opgapp"
+	"opg-aws-key-rotation-scheduler-app/pkg/pref"
 	"opg-aws-key-rotation-scheduler-app/pkg/storage"
 	"os"
 	"path/filepath"
@@ -23,13 +23,6 @@ var (
 const (
 	lockfileName    string = "lock.v1"
 	currentFileName string = "current.v1"
-)
-
-// preferences for rotation frequency
-const (
-	rotationPreferencesKey        string = "rotation_frequency"
-	rotationPreferencesEnvVarName string = "OPGAWSKEYROTATION_TRACKER_LIFETIME"
-	rotationFallbackLifetime      string = "24h"
 )
 
 // Track struct holds timestamp and lifetime for a key
@@ -131,11 +124,7 @@ func Unlock() (err error) {
 }
 
 func Clean() (tr Track) {
-	lifetime = opgapp.Preferences.StringWithFallback(rotationPreferencesKey, rotationFallbackLifetime)
-	if envVal := os.Getenv(rotationPreferencesEnvVarName); len(envVal) > 0 {
-		lifetime = envVal
-		defer debugger.Log("tracker.Clean()", debugger.VERBOSE, "lifetime from env var", lifetime)()
-	}
+	lifetime = pref.PREFERENCES.TrackerLifetime.Get()
 	tr = Track{Timestamp: time.Now().UTC(), Lifetime: lifetime}
 	defer debugger.Log("tracker.Clean()", debugger.VERBOSE, tr)()
 	return
