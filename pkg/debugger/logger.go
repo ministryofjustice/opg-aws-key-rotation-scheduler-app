@@ -35,7 +35,7 @@ func Log(message string, level int, values ...interface{}) func() {
 	}
 	t := time.Now().UTC()
 	return func() {
-		str := fmt.Sprintf("[%s] %s\n", t, message)
+		str := fmt.Sprintf("[%s](level:%s) %s\n", t, levelToString[level], message)
 		for _, v := range values {
 			str += fmt.Sprintf("%v\n", v)
 		}

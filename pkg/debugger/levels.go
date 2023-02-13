@@ -10,6 +10,10 @@ const (
 	ALL      int = 900
 )
 
-func SetLevel(lvl int) {
-	LEVEL = lvl
+var levelToString map[int]string = map[int]string{
+	ERR:      "ERR",
+	INFO:     "INFO",
+	DETAILED: "DETAILED",
+	VERBOSE:  "VERBOSE",
+	ALL:      "ALL",
 }
