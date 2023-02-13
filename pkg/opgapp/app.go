@@ -42,12 +42,12 @@ var (
 )
 
 // debug preferences
-var (
+const (
 	debugPreferencesKey      string = "debug"
 	debugFallback            bool   = false
 	debugLevelPreferencesKey string = "debugger_level"
 	debugLevelFallback       int    = debugger.DETAILED
-	debugEnvVarName          string = "OPG_AWS_KEY_ROTATION_DEBUG"
+	debugEnvVarName          string = "OPGAWSKEYROTATION_DEBUG"
 )
 
 func debugSetup() {

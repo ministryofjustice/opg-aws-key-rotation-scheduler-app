@@ -19,11 +19,17 @@ var (
 	lifetime    string
 )
 
+// filepaths
 const (
-	lockfileName             string = "lock.v1"
-	currentFileName          string = "current.v1"
-	rotationPreferencesKey   string = "rotation_frequency"
-	rotationFallbackLifetime string = "15m"
+	lockfileName    string = "lock.v1"
+	currentFileName string = "current.v1"
+)
+
+// preferences for rotation frequency
+const (
+	rotationPreferencesKey        string = "rotation_frequency"
+	rotationPreferencesEnvVarName string = "OPGAWSKEYROTATION_TRACKER_LIFETIME"
+	rotationFallbackLifetime      string = "24h"
 )
 
 // Track struct holds timestamp and lifetime for a key
@@ -126,7 +132,12 @@ func Unlock() (err error) {
 
 func Clean() (tr Track) {
 	lifetime = opgapp.Preferences.StringWithFallback(rotationPreferencesKey, rotationFallbackLifetime)
+	if envVal := os.Getenv(rotationPreferencesEnvVarName); len(envVal) > 0 {
+		lifetime = envVal
+		defer debugger.Log("tracker.Clean()", debugger.VERBOSE, "lifetime from env var", lifetime)()
+	}
 	tr = Track{Timestamp: time.Now().UTC(), Lifetime: lifetime}
+	defer debugger.Log("tracker.Clean()", debugger.VERBOSE, tr)()
 	return
 }
 
