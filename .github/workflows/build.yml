@@ -35,7 +35,7 @@ jobs:
         INITIAL_VERSION: 0.8.0
         DEFAULT_BUMP: minor
         BRANCH_HISTORY: full
-        PRERELEASE_SUFFIX: ${{ need.branch_name.parsed_branch }}
+        PRERELEASE_SUFFIX: ${{ needs.branch_name.parsed_branch }}
         RELEASE_BRANCHES: main
         WITH_V: true
     
