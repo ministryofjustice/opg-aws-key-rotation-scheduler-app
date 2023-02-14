@@ -30,7 +30,10 @@ func ProfileDirectory() string {
 
 func StorageDirectory() string {
 	if _, dirErr := os.Stat(storageDirectory); os.IsNotExist(dirErr) {
-		os.MkdirAll(storageDirectory, StoragePermissionMode)
+		err := os.MkdirAll(storageDirectory, StoragePermissionMode)
+		if err != nil {
+			panic(err)
+		}
 	}
 	return storageDirectory
 }
