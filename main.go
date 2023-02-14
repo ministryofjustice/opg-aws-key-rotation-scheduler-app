@@ -18,12 +18,11 @@ var (
 	supportErrors []string = []string{}
 )
 
-func profiling() (cpuFile *os.File, memoryFile *os.File) {
+func profiling() (cpuFile *os.File) {
+	cpuFileName := "cpu.prof"
 	pDir := storage.ProfileDirectory()
-	cpu := filepath.Join(pDir, "cpu.prof")
-	memory := filepath.Join(pDir, "memory.prof")
+	cpu := filepath.Clean(filepath.Join(pDir, cpuFileName))
 	cpuFile, _ = os.Create(cpu)
-	memoryFile, _ = os.Create(memory)
 	return
 
 }
@@ -68,13 +67,17 @@ func init() {
 }
 
 func main() {
+	var err error
 	// turn on debug
 	if pref.PREFERENCES.Debug.Get() {
 		debugger.LEVEL = debugger.ALL
 	}
 	if pref.PREFERENCES.CpuProfiling.Get() {
-		cpuF, _ := profiling()
-		pprof.StartCPUProfile(cpuF)
+		cpuF := profiling()
+		err = pprof.StartCPUProfile(cpuF)
+		if err != nil {
+			panic(err)
+		}
 		defer pprof.StopCPUProfile()
 	}
 
