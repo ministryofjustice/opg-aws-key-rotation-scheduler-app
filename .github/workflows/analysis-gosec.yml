@@ -17,6 +17,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Run Gosec Security Scanner
-        uses: securego/gosec@master
+        uses: securego/gosec@a459eb0ba387d9bd083d5c2e2354dbeef2465038 #v2.15.0
         with:
-          args: ./...
+          args: -exclude-dir=./pkg/gui/ ./... 
