@@ -79,7 +79,7 @@ func (tr *Track) Json() (content []byte) {
 // track file finto a Track struct for use
 //   - returns an error from either the readfile or unmarshaling
 func GetCurrent() (tr Track, err error) {
-	content, err := os.ReadFile(currentfile)
+	content, err := os.ReadFile(filepath.Clean(currentfile))
 	if err != nil {
 		return
 	}
@@ -100,7 +100,7 @@ func SetCurrent(tr Track) (t Track, err error) {
 // GetLock returns the lock file if it exists as a struct
 //   - returns error from either readfile or unmarshal
 func GetLock() (tr Track, err error) {
-	content, err := os.ReadFile(lockfile)
+	content, err := os.ReadFile(filepath.Clean(lockfile))
 	if err != nil {
 		return
 	}
@@ -146,6 +146,6 @@ func New() (tr Track) {
 // directly
 func init() {
 	directory = storage.StorageDirectory()
-	lockfile = filepath.Join(directory, lockfileName)
-	currentfile = filepath.Join(directory, currentFileName)
+	lockfile = filepath.Clean(filepath.Join(directory, lockfileName))
+	currentfile = filepath.Clean(filepath.Join(directory, currentFileName))
 }

@@ -1,4 +1,4 @@
-package gui
+package gui //#nosec
 
 /*
 #cgo CFLAGS: -x objective-c

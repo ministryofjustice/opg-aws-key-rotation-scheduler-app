@@ -54,7 +54,10 @@ func UpdateMenu() {
 // cleanup the file and carry on
 func MenuOldLock() {
 	defer debugger.Log("gui.MenuOldLock()", debugger.INFO, "Key is locked and too old, so removing...")()
-	tracker.Unlock()
+	var err error = tracker.Unlock()
+	if err != nil {
+		panic(err)
+	}
 }
 
 // MenuLocked updates gui to show that there is a
@@ -79,7 +82,10 @@ func MenuRotatingSoon() {
 // a key and show the status of that change
 func MenuRotate() {
 	debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotating key...")()
-	tracker.SetLock(Track)
+	var err error = tracker.SetLock(Track)
+	if err != nil {
+		panic(err)
+	}
 
 	cfg.Desktop.SetSystemTrayIcon(icons.Rotating(cfg.IsDarkMode))
 	menuInformation.Label = labels.Rotating
@@ -91,7 +97,10 @@ func MenuRotate() {
 
 	debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotate command finished", "stdOut:", sOut, "stdErr:", sErr)()
 	if err == nil {
-		tracker.Unlock()
+		err = tracker.Unlock()
+		if err != nil {
+			panic(err)
+		}
 		// new reacker
 		Track, _ = tracker.SetCurrent(tracker.Clean())
 
