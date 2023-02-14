@@ -8,19 +8,22 @@ on:
 permissions:
   actions: read
   checks: read
-  contents: none
-  deployments: none
-  issues: none
-  packages: none
   pull-requests: write
-  repository-projects: none
   security-events: none
-  statuses: none
+  statuses: write
+  
 
 jobs:
   codeql:
-    uses: ministryofjustice/opg-github-workflows/.github/workflows/analysis-application-codeql-sast-to-github-security.yml@main
-    with:
-      application_languages: '["go"]'
-    secrets:
-      github_token: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: "go"
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
