@@ -17,7 +17,7 @@ var (
 		"cpu_profiling":      "false",
 		"date_time_format":   "02-Jan-2006 15:04",
 		"tick":               "1m",
-		"rotation_frequency": "24h",
+		"rotation_frequency": "168h",
 		"lock_max_age":       "5m",
 		"profile_cli_tool":   "aws",
 		"profile_name":       "identity",

@@ -105,7 +105,7 @@ A varity of settings are configurable by settings environment variables, they ar
 
 - `OPGAWSKeyRotation_debug` - enables full logging when set to `"true"`
 - `OPGAWSKeyRotation_cpu_profiling` - enables cpu profiling when set to `"true"`
-- `OPGAWSKeyRotation_rotation_frequency` - controls how often the keys should be rotated. Supports `go time.Duration` format (default: `"24h"`)
+- `OPGAWSKeyRotation_rotation_frequency` - controls how often the keys should be rotated. Supports `go time.Duration` format (default: `"168h"` - 7 days)
 - `OPGAWSKeyRotation_profile_cli_tool` - set the name of the aws cli tool (default: `aws`)
 - `OPGAWSKeyRotation_profile_name` - set the name of the aws profile to be used (default: `identity`)
 - `OPGAWSKeyRotation_vault_tool` - set the name of the vault cli tool (default: `aws-vault`)
