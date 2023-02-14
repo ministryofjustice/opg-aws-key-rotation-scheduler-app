@@ -39,6 +39,7 @@ jobs:
         DEFAULT_BUMP: minor
         PRERELEASE_SUFFIX: ${{ needs.branch_name.parsed_branch }}
         RELEASE_BRANCHES: main
+        PRERELEASE: ${{ !startsWith(needs.branch_name.parsed_branch, 'main') }}
         WITH_V: true
     
   build_from_makefile:
