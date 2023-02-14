@@ -22,5 +22,3 @@ jobs:
     uses: ministryofjustice/opg-github-workflows/.github/workflows/analysis-application-codeql-sast-to-github-security.yml@main
     with:
       application_languages: '["go"]'
-    secrets:
-      github_token: ${{ secrets.GITHUB_TOKEN }}
