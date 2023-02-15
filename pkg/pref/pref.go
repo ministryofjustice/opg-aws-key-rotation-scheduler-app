@@ -1,13 +1,12 @@
 package pref
 
 import (
+	"encoding/json"
 	"time"
-
-	"fyne.io/fyne/v2"
 )
 
 var (
-	_preferences fyne.Preferences
+	_preferences map[string]string
 	_appName     string
 
 	PREFERENCES *AppPreferences = &AppPreferences{}
@@ -25,9 +24,12 @@ var (
 	}
 )
 
-func New(appName string, appPreferences fyne.Preferences) (ap *AppPreferences) {
+func New(appName string, appPreferences string) (ap *AppPreferences) {
 	_appName = appName
-	_preferences = appPreferences
+	err := json.Unmarshal([]byte(appPreferences), &_preferences)
+	if err != nil {
+		panic(err)
+	}
 	ap = &AppPreferences{
 		Debug:           newPD[bool](&_appName, &_preferences, "debug", Fbs["debug"], strToBool),
 		CpuProfiling:    newPD[bool](&_appName, &_preferences, "cpu_profiling", Fbs["cpu_profiling"], strToBool),

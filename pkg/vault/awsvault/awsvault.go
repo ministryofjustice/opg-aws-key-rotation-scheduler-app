@@ -32,7 +32,7 @@ func (v *AwsVault) Supported(sh shell.Shell) (supported bool) {
 }
 
 func (v *AwsVault) Command(p profile.Profile, os osinfo.OsInfo) (str string) {
-	str = fmt.Sprintf(rotate, path, p.Name(), os.Prompt())
+	str = fmt.Sprintf(rotate, path, p.Name(), os.PromptCommand())
 	defer debugger.Log("AwsVault.Command()", debugger.INFO, str)()
 	return
 }
