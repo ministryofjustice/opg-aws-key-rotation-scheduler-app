@@ -13,7 +13,6 @@ const (
 
 var (
 	App       fyne.App
-	Window    fyne.Window
 	Desktop   desktop.App
 	IsDesktop bool
 )
@@ -21,6 +20,5 @@ var (
 func init() {
 	// fyne app setup
 	App = app.NewWithID(AppId)
-	Window = App.NewWindow(AppName)
 	Desktop, IsDesktop = App.(desktop.App)
 }

@@ -89,14 +89,8 @@ func main() {
 	Track = tracker.New()
 	// check for support
 	supportErrors = supported()
-	if !cfg.IsDesktop {
-		supportErrors = append(supportErrors, errors.IsNotDesktop)
-	}
 
-	if len(supportErrors) > 0 {
-		window := gui.ErrorDialog(cfg.App, cfg.Window, supportErrors)
-		window.ShowAndRun()
-	} else {
+	if len(supportErrors) == 0 {
 		cfg.IsDarkMode = cfg.Os.DarkMode(cfg.Shell)
 		gui.StartApp(Track)
 	}

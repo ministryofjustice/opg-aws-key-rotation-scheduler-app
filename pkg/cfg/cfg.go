@@ -20,7 +20,6 @@ const (
 
 var (
 	App       fyne.App
-	Window    fyne.Window
 	Desktop   desktop.App
 	IsDesktop bool
 )
@@ -37,7 +36,6 @@ var (
 
 func init() {
 	App = guicfg.App
-	Window = guicfg.Window
 	Desktop = guicfg.Desktop
 
 	// -- app code required vars
