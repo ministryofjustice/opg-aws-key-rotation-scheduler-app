@@ -8,8 +8,9 @@ import (
 
 type OsInfo interface {
 	Supported() bool
-	Prompt() string
+	PromptCommand() string
 	DarkMode(sh shell.Shell) bool
+	SystemMessage(sh shell.Shell, appName string, msgs []string, msgType string)
 }
 
 func New() (os OsInfo) {
