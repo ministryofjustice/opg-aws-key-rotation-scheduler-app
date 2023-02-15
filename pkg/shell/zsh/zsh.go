@@ -2,6 +2,7 @@ package zsh
 
 import (
 	"fmt"
+
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"os"
 	"os/exec"
@@ -13,6 +14,7 @@ import (
 const (
 	which    string = "which"
 	load     string = "source"
+	env      string = "env"
 	profiles string = ".zprofile,.profile"
 )
 
@@ -91,7 +93,7 @@ func (sh *Zsh) Search(commandName string, withProfile bool) (path string, stdout
 	}
 
 	cmd := fmt.Sprintf("%s%s %s", pre, which, commandName)
-	stdout, stderr, err = sh.Run([]string{cmd}, false, true)
+	stdout, stderr, err = sh.Run(cmd, false, true)
 	path = stdout.String()
 
 	// if there is an error, and the result contains "not found", or if
@@ -109,23 +111,26 @@ func (sh *Zsh) Search(commandName string, withProfile bool) (path string, stdout
 }
 
 // Run creates and executes a cmd using zsh shell as a wrapper
-func (sh *Zsh) Run(args []string, withProfile bool, withCache bool) (stdout *strings.Builder, stderr *strings.Builder, err error) {
+//   - withProfile will trigger a source on ~/.zprofile to be included ahead of the cmd
+//   - withCache will cache the result of the cmd in memory
+func (sh *Zsh) Run(shellCmd string, withProfile bool, withCache bool) (stdout *strings.Builder, stderr *strings.Builder, err error) {
 	var pre string
 	var pErr error
 
 	stdout = new(strings.Builder)
 	stderr = new(strings.Builder)
 	shell, _ := sh.Self()
-
+	// basic args to show we're running a command in the shell
 	cmdArgs := []string{"-s", "-c"}
+	// prepend a source to the command if requested and profile exists
 	if withProfile {
 		if pre, pErr = sh.Profile(); pErr == nil {
-			cmdArgs = append(cmdArgs, pre)
+			shellCmd = pre + shellCmd
 		}
 		defer debugger.Log("Zsh.Run()", debugger.VERBOSE, "withProfile requested", "profile:", pre)()
 	}
-	cmdArgs = append(cmdArgs, args...)
-
+	cmdArgs = append(cmdArgs, shellCmd)
+	// look out the cmd within the cache and return if found and requested
 	if cached, found := fromCache(shell, cmdArgs); withCache && found {
 		stdout = cached.Stdout
 		stderr = cached.Stderr
@@ -143,5 +148,19 @@ func (sh *Zsh) Run(args []string, withProfile bool, withCache bool) (stdout *str
 		defer toCache(shell, cmdArgs, stdout, stderr, err)
 	}
 
+	return
+}
+
+func (sh *Zsh) Env() (vars map[string]string) {
+	vars = map[string]string{}
+
+	o, _, err := sh.Run(env, true, false)
+	if err == nil {
+		for _, line := range strings.Split(o.String(), "\n") {
+			if v := strings.Split(line, "="); len(v) == 2 {
+				vars[v[0]] = v[1]
+			}
+		}
+	}
 	return
 }

@@ -33,8 +33,7 @@ func (os *Darwin) Supported() (supported bool) {
 
 func (os *Darwin) DarkMode(sh shell.Shell) (isDarkMode bool) {
 	isDarkMode = false
-	args := []string{darkModeCommand}
-	stdout, _, err := sh.Run(args, false, true)
+	stdout, _, err := sh.Run(darkModeCommand, false, true)
 	if err == nil {
 		mode := strings.ReplaceAll(strings.ToLower(stdout.String()), "\n", "")
 		isDarkMode = (mode == dark)
@@ -46,7 +45,7 @@ func (os *Darwin) DarkMode(sh shell.Shell) (isDarkMode bool) {
 func (os *Darwin) SystemMessage(sh shell.Shell, appName string, msgs []string, msgType string) {
 
 	cmd := fmt.Sprintf(sysMessage, os.PromptCommand(), appName, msgType, strings.Join(msgs, "\n"))
-	_, _, err := sh.Run([]string{cmd}, false, false)
+	_, _, err := sh.Run(cmd, false, false)
 	if err != nil {
 		panic(err)
 	}

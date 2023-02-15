@@ -8,11 +8,12 @@ import (
 )
 
 func TestAwsProfileSupported(t *testing.T) {
-	pref.PREFERENCES = pref.New("test-app", "{}")
+	s := shell.New()
+	pref.PREFERENCES = pref.New("test-app", "{}", s)
 
 	p := &AwsProfile{}
 
-	installed, profile, region := p.Supported(shell.New())
+	installed, profile, region := p.Supported(s)
 
 	fmt.Println(installed, profile, region)
 

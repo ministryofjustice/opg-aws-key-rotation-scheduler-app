@@ -39,7 +39,7 @@ func (p *AwsProfile) Supported(sh shell.Shell) (installed bool, identityProfileF
 		pl := fmt.Sprintf(profileList, p.Name())
 
 		cmd := fmt.Sprintf("%s %s", path, pl)
-		sOut, _, err := sh.Run([]string{cmd}, false, true)
+		sOut, _, err := sh.Run(cmd, false, true)
 		hasProfile := strings.Contains(sOut.String(), p.Name())
 
 		debugger.Log("AwsProfile.Supported()", debugger.VERBOSE, "profile found:", hasProfile, "sOut:", sOut.String(), "err:", err)()
@@ -54,7 +54,7 @@ func (p *AwsProfile) Supported(sh shell.Shell) (installed bool, identityProfileF
 			// check the profile and default
 			for _, c := range []string{regionCheckDefault, rCheck} {
 				cmd = fmt.Sprintf("%s %s", path, c)
-				sOut, _, err = sh.Run([]string{cmd}, false, true)
+				sOut, _, err = sh.Run(cmd, false, true)
 				hasRegion = strings.Contains(sOut.String(), "-")
 				debugger.Log("AwsProfile.Supported()", debugger.VERBOSE, "regioncheck:", c, "hasRegion:", hasRegion)()
 				if err == nil && hasRegion {
