@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime/pprof"
+	"strconv"
 )
 
 //go:embed preferences.json
@@ -27,6 +28,7 @@ func profiling() (cpuFile *os.File) {
 	cpuFileName := "cpu.prof"
 	pDir := storage.ProfileDirectory()
 	cpu := filepath.Clean(filepath.Join(pDir, cpuFileName))
+	debugger.Log("main.profiling()", debugger.INFO, "cpu profile file:\t"+cpu)()
 	cpuFile, _ = os.Create(cpu)
 	return
 
@@ -66,18 +68,23 @@ func supported() (errs []string) {
 }
 
 func init() {
+	debugger.Create()
 	// config the preferences data with info from cfg
 	pref.PREFERENCES = pref.New(cfg.AppBuiltName, preferences, cfg.Shell)
-
 }
 
 func main() {
 	var err error
 	// turn on debug
-	if pref.PREFERENCES.Debug.Get() {
+	debug := pref.PREFERENCES.Debug.Get()
+	debugger.Log("main", debugger.INFO, "debug:\t"+strconv.FormatBool(debug))()
+	if debug {
 		debugger.LEVEL = debugger.ALL
 	}
-	if pref.PREFERENCES.CpuProfiling.Get() {
+
+	prof := pref.PREFERENCES.CpuProfiling.Get()
+	debugger.Log("main", debugger.INFO, "cpu profiling:\t"+strconv.FormatBool(prof))()
+	if prof {
 		cpuF := profiling()
 		err = pprof.StartCPUProfile(cpuF)
 		if err != nil {

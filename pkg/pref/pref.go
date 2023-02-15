@@ -25,9 +25,9 @@ var (
 	}
 )
 
-func New(appName string, appPreferences string, sh shell.Shell) (ap *AppPreferences) {
+func New(appName string, appPreferencesFileContent string, sh shell.Shell) (ap *AppPreferences) {
 	_appName = appName
-	err := json.Unmarshal([]byte(appPreferences), &_preferences)
+	err := json.Unmarshal([]byte(appPreferencesFileContent), &_preferences)
 	if err != nil {
 		panic(err)
 	}
