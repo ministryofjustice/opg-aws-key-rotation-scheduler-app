@@ -15,6 +15,8 @@ const (
 	dark            string = "dark"
 )
 
+var sysMessage string = `%s -e 'tell app "%s" to display alert "%s" message "%s" '`
+
 type Darwin struct{}
 
 func (os *Darwin) PromptCommand() string {
@@ -41,7 +43,9 @@ func (os *Darwin) DarkMode(sh shell.Shell) (isDarkMode bool) {
 	return
 }
 
-func (os *Darwin) Errors(sh shell.Shell, app string, errors []string) {
-	cmd := fmt.Sprintf(`%s -e 'tell app "%s" to display alert "Errors" message "- %s" '`, os.Prompt(), app, strings.Join(errors, "\n - "))
+func (os *Darwin) SystemMessage(sh shell.Shell, appName string, msgs []string, msgType string) {
+
+	cmd := fmt.Sprintf(sysMessage, os.PromptCommand(), appName, msgType, strings.Join(msgs, "\n"))
 	sh.Run([]string{cmd}, false, false)
+
 }

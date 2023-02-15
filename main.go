@@ -6,6 +6,7 @@ import (
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"opg-aws-key-rotation-scheduler-app/pkg/errors"
 	"opg-aws-key-rotation-scheduler-app/pkg/gui"
+	"opg-aws-key-rotation-scheduler-app/pkg/labels"
 	"opg-aws-key-rotation-scheduler-app/pkg/pref"
 	"opg-aws-key-rotation-scheduler-app/pkg/storage"
 	"opg-aws-key-rotation-scheduler-app/pkg/tracker"
@@ -94,7 +95,7 @@ func main() {
 		cfg.IsDarkMode = cfg.Os.DarkMode(cfg.Shell)
 		gui.StartApp(Track)
 	} else {
-		cfg.Os.Errors(cfg.Shell, cfg.AppBuiltName, supportErrors)
+		cfg.Os.SystemMessage(cfg.Shell, cfg.AppBuiltName, supportErrors, labels.SystemError)
 	}
 
 }

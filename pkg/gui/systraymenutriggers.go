@@ -106,14 +106,15 @@ func MenuRotate() {
 		Track, _ = tracker.SetCurrent(tracker.Clean())
 
 		debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotated successfully", "new tracker:", Track)()
-		menuInformation.SetTitle(
-			fmt.Sprintf(labels.NextRotation, Track.ExpiresAt().Format(dateTimeFormat)))
+		nextRotate := fmt.Sprintf(labels.NextRotation, Track.ExpiresAt().Format(dateTimeFormat))
+		menuInformation.SetTitle(nextRotate)
 		menuRotate.Enable()
 		systray.SetIcon(icons.Default(cfg.IsDarkMode))
+		cfg.Os.SystemMessage(cfg.Shell, cfg.AppBuiltName, []string{nextRotate}, labels.SystemSuccess)
 
 	} else {
 		debugger.Log("gui.MenuRotate()", debugger.ERR, "Rotate failed", "err:", err, "stdErr:", sErr.String())()
-		cfg.Os.Errors(cfg.Shell, cfg.AppBuiltName, []string{sErr.String(), err.Error()})
+		cfg.Os.SystemMessage(cfg.Shell, cfg.AppBuiltName, []string{sErr.String(), err.Error()}, labels.SystemError)
 		MenuLocked()
 	}
 
