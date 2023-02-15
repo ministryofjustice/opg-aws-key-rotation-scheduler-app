@@ -11,7 +11,7 @@ type Shell interface {
 	Self() (string, error)
 	Profile() (profile string, err error)
 	Search(commandName string, withProfile bool) (path string, stdout *strings.Builder, stderr *strings.Builder, err error)
-	Run(args []string, withProfile bool) (stdout *strings.Builder, stderr *strings.Builder, err error)
+	Run(args []string, withProfile bool, withCache bool) (stdout *strings.Builder, stderr *strings.Builder, err error)
 }
 
 // New the users shell for the app based off preferences
