@@ -46,6 +46,9 @@ func (os *Darwin) DarkMode(sh shell.Shell) (isDarkMode bool) {
 func (os *Darwin) SystemMessage(sh shell.Shell, appName string, msgs []string, msgType string) {
 
 	cmd := fmt.Sprintf(sysMessage, os.PromptCommand(), appName, msgType, strings.Join(msgs, "\n"))
-	sh.Run([]string{cmd}, false, false)
+	_, _, err := sh.Run([]string{cmd}, false, false)
+	if err != nil {
+		panic(err)
+	}
 
 }
