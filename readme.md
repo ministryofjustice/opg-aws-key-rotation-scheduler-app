@@ -2,7 +2,7 @@
 
 This code base uses `golang` and `fyne` to create `macOS` applications (both `arm64` and `amd64`) that when installed will trigger the rotation of your identity access keys on a set interval.
 
-While trailing the app between arch versions the interval is set as `two hours`, with a check running every minute. This will be lengthed when more testing has been done.
+Rotation is triggered every `168 hrs` (7 days), with a check running every minute. 
 
 ## Requirements
 
