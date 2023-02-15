@@ -132,4 +132,12 @@ jobs:
           generate_release_notes: true
           files: |
             release/**
+
+  end_of_workflow:
+    name: "End"
+    needs: ["create_app_release"]
+    runs-on: "ubuntu-latest"            
+    steps:
+      - name: "End"
+        run: echo "Complete"
             
