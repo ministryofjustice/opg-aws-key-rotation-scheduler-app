@@ -1,13 +1,13 @@
 package pref
 
 import (
+	"encoding/json"
+	"opg-aws-key-rotation-scheduler-app/pkg/shell"
 	"time"
-
-	"fyne.io/fyne/v2"
 )
 
 var (
-	_preferences fyne.Preferences
+	_preferences map[string]string
 	_appName     string
 
 	PREFERENCES *AppPreferences = &AppPreferences{}
@@ -25,19 +25,22 @@ var (
 	}
 )
 
-func New(appName string, appPreferences fyne.Preferences) (ap *AppPreferences) {
+func New(appName string, appPreferences string, sh shell.Shell) (ap *AppPreferences) {
 	_appName = appName
-	_preferences = appPreferences
+	err := json.Unmarshal([]byte(appPreferences), &_preferences)
+	if err != nil {
+		panic(err)
+	}
 	ap = &AppPreferences{
-		Debug:           newPD[bool](&_appName, &_preferences, "debug", Fbs["debug"], strToBool),
-		CpuProfiling:    newPD[bool](&_appName, &_preferences, "cpu_profiling", Fbs["cpu_profiling"], strToBool),
-		DateTimeFormat:  newPD[string](&_appName, &_preferences, "date_time_format", Fbs["date_time_format"], strToStr),
-		Tick:            newPD[time.Duration](&_appName, &_preferences, "tick", Fbs["tick"], strToDuration),
-		TrackerLifetime: newPD[string](&_appName, &_preferences, "rotation_frequency", Fbs["rotation_frequency"], strToStr),
-		LockMaxAge:      newPD[time.Duration](&_appName, &_preferences, "lock_max_age", Fbs["lock_max_age"], strToDuration),
-		ProfileTool:     newPD[string](&_appName, &_preferences, "profile_cli_tool", Fbs["profile_cli_tool"], strToStr),
-		ProfileIdentity: newPD[string](&_appName, &_preferences, "profile_name", Fbs["profile_name"], strToStr),
-		VaultTool:       newPD[string](&_appName, &_preferences, "vault_tool", Fbs["vault_tool"], strToStr),
+		Debug:           newPD[bool](&_appName, &_preferences, &sh, "debug", Fbs["debug"], strToBool),
+		CpuProfiling:    newPD[bool](&_appName, &_preferences, &sh, "cpu_profiling", Fbs["cpu_profiling"], strToBool),
+		DateTimeFormat:  newPD[string](&_appName, &_preferences, &sh, "date_time_format", Fbs["date_time_format"], strToStr),
+		Tick:            newPD[time.Duration](&_appName, &_preferences, &sh, "tick", Fbs["tick"], strToDuration),
+		TrackerLifetime: newPD[string](&_appName, &_preferences, &sh, "rotation_frequency", Fbs["rotation_frequency"], strToStr),
+		LockMaxAge:      newPD[time.Duration](&_appName, &_preferences, &sh, "lock_max_age", Fbs["lock_max_age"], strToDuration),
+		ProfileTool:     newPD[string](&_appName, &_preferences, &sh, "profile_cli_tool", Fbs["profile_cli_tool"], strToStr),
+		ProfileIdentity: newPD[string](&_appName, &_preferences, &sh, "profile_name", Fbs["profile_name"], strToStr),
+		VaultTool:       newPD[string](&_appName, &_preferences, &sh, "vault_tool", Fbs["vault_tool"], strToStr),
 	}
 	return
 }

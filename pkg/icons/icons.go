@@ -4,8 +4,6 @@ import (
 	"embed"
 	_ "embed"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
-
-	"fyne.io/fyne/v2"
 )
 
 var (
@@ -32,37 +30,37 @@ var (
 	LightModeRotatingSoon []byte
 )
 
-func Default(isDarkMode bool) (r fyne.Resource) {
-	r = fyne.NewStaticResource("default", LightModeDefault)
+func Default(isDarkMode bool) (i []byte) {
+	i = LightModeDefault
 	if isDarkMode {
-		r = fyne.NewStaticResource("default", DarkModeDefault)
+		i = DarkModeDefault
 	}
 	defer debugger.Log("icons.Default()", debugger.INFO, isDarkMode)()
 	return
 }
 
-func Locked(isDarkMode bool) (r fyne.Resource) {
-	r = fyne.NewStaticResource("locked", LightModeLocked)
+func Locked(isDarkMode bool) (i []byte) {
+	i = LightModeLocked
 	if isDarkMode {
-		r = fyne.NewStaticResource("locked", DarkModeLocked)
+		i = DarkModeLocked
 	}
 	defer debugger.Log("icons.Locked()", debugger.INFO, isDarkMode)()
 	return
 }
 
-func Rotating(isDarkMode bool) (r fyne.Resource) {
-	r = fyne.NewStaticResource("rotating", LightModeRotating)
+func Rotating(isDarkMode bool) (i []byte) {
+	i = LightModeRotating
 	if isDarkMode {
-		r = fyne.NewStaticResource("rotating", DarkModeRotating)
+		i = DarkModeRotating
 	}
 	defer debugger.Log("icons.Rotating()", debugger.INFO, isDarkMode)()
 	return
 }
 
-func RotatingSoon(isDarkMode bool) (r fyne.Resource) {
-	r = fyne.NewStaticResource("rotating-soon", LightModeRotatingSoon)
+func RotatingSoon(isDarkMode bool) (i []byte) {
+	i = LightModeRotatingSoon
 	if isDarkMode {
-		r = fyne.NewStaticResource("rotating-soon", DarkModeRotatingSoon)
+		i = DarkModeRotatingSoon
 	}
 	defer debugger.Log("icons.RotatingSoon()", debugger.INFO, isDarkMode)()
 	return
