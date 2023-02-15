@@ -1,17 +1,23 @@
 package main
 
 import (
+	_ "embed"
 	"opg-aws-key-rotation-scheduler-app/pkg/cfg"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"opg-aws-key-rotation-scheduler-app/pkg/errors"
 	"opg-aws-key-rotation-scheduler-app/pkg/gui"
+	"opg-aws-key-rotation-scheduler-app/pkg/labels"
 	"opg-aws-key-rotation-scheduler-app/pkg/pref"
 	"opg-aws-key-rotation-scheduler-app/pkg/storage"
 	"opg-aws-key-rotation-scheduler-app/pkg/tracker"
 	"os"
 	"path/filepath"
 	"runtime/pprof"
+	"strconv"
 )
+
+//go:embed preferences.json
+var preferences string
 
 var (
 	Track         tracker.Track
@@ -22,6 +28,7 @@ func profiling() (cpuFile *os.File) {
 	cpuFileName := "cpu.prof"
 	pDir := storage.ProfileDirectory()
 	cpu := filepath.Clean(filepath.Join(pDir, cpuFileName))
+	debugger.Log("main.profiling()", debugger.INFO, "cpu profile file:\t"+cpu)()
 	cpuFile, _ = os.Create(cpu)
 	return
 
@@ -61,18 +68,23 @@ func supported() (errs []string) {
 }
 
 func init() {
+	debugger.Create()
 	// config the preferences data with info from cfg
-	pref.PREFERENCES = pref.New(cfg.AppName, cfg.Preferences)
-
+	pref.PREFERENCES = pref.New(cfg.AppBuiltName, preferences, cfg.Shell)
 }
 
 func main() {
 	var err error
 	// turn on debug
-	if pref.PREFERENCES.Debug.Get() {
+	debug := pref.PREFERENCES.Debug.Get()
+	debugger.Log("main", debugger.INFO, "debug:\t"+strconv.FormatBool(debug))()
+	if debug {
 		debugger.LEVEL = debugger.ALL
 	}
-	if pref.PREFERENCES.CpuProfiling.Get() {
+
+	prof := pref.PREFERENCES.CpuProfiling.Get()
+	debugger.Log("main", debugger.INFO, "cpu profiling:\t"+strconv.FormatBool(prof))()
+	if prof {
 		cpuF := profiling()
 		err = pprof.StartCPUProfile(cpuF)
 		if err != nil {
@@ -85,16 +97,12 @@ func main() {
 	Track = tracker.New()
 	// check for support
 	supportErrors = supported()
-	if !cfg.IsDesktop {
-		supportErrors = append(supportErrors, errors.IsNotDesktop)
-	}
 
-	if len(supportErrors) > 0 {
-		window := gui.ErrorDialog(cfg.App, cfg.Window, supportErrors)
-		window.ShowAndRun()
-	} else {
+	if len(supportErrors) == 0 {
 		cfg.IsDarkMode = cfg.Os.DarkMode(cfg.Shell)
 		gui.StartApp(Track)
+	} else {
+		cfg.Os.SystemMessage(cfg.Shell, cfg.AppBuiltName, supportErrors, labels.SystemError)
 	}
 
 }

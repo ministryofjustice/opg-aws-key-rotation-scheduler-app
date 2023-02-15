@@ -16,7 +16,10 @@ var _fileMode fs.FileMode = 0755
 var err error
 
 func init() {
+	Create()
+}
 
+func Create() {
 	directory := storage.StorageDirectory()
 	stdoutfile := filepath.Clean(filepath.Join(directory, "stdout.log"))
 	stderrfile := filepath.Clean(filepath.Join(directory, "stderr.log"))
@@ -35,7 +38,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 func Log(message string, level int, values ...interface{}) func() {

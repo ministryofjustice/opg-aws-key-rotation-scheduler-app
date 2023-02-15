@@ -1,14 +1,14 @@
 package gui
 
 import (
-	"opg-aws-key-rotation-scheduler-app/pkg/cfg"
-	"opg-aws-key-rotation-scheduler-app/pkg/icons"
+	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"opg-aws-key-rotation-scheduler-app/pkg/pref"
 	"opg-aws-key-rotation-scheduler-app/pkg/tracker"
 	"sync"
 	"time"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/systray"
 )
 
 // how old a lock should be
@@ -16,8 +16,9 @@ const ()
 
 // menu items - fyne specific
 var (
-	menuInformation *fyne.MenuItem
-	menuRotate      *fyne.MenuItem
+	menuInformation *systray.MenuItem
+	menuRotate      *systray.MenuItem
+	menuQuit        *systray.MenuItem
 	menu            *fyne.Menu
 )
 
@@ -48,19 +49,9 @@ func StartApp(tr tracker.Track) {
 	// - locks
 	lockMaxAge = pref.PREFERENCES.LockMaxAge.Get()
 
-	// setup the app tray
-	SystraySetup()
-	cfg.Desktop.SetSystemTrayMenu(menu)
-	cfg.Desktop.SetSystemTrayIcon(icons.Default(cfg.IsDarkMode))
-
-	UpdateMenu()
-	// trigger the activation policy to remove the docker icon etc
-	cfg.App.Lifecycle().SetOnStarted(func() {
-		go func() {
-			time.Sleep(200 * time.Millisecond)
-			setActivationPolicy()
-		}()
+	systray.Run(SystraySetup, func() {
+		defer debugger.Log("systray.Run", debugger.INFO, "exiting")()
 	})
+	// setup the app tray
 
-	cfg.App.Run()
 }

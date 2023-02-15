@@ -6,3 +6,9 @@ const (
 	Rotate       string = "Rotate"
 	Locked       string = "Locked"
 )
+
+const (
+	SystemMessage string = "Information"
+	SystemError   string = "Error"
+	SystemSuccess string = "✔ Rotation Successfull"
+)

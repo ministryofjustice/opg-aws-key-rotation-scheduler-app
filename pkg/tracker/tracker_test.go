@@ -2,16 +2,14 @@ package tracker
 
 import (
 	"opg-aws-key-rotation-scheduler-app/pkg/pref"
+	"opg-aws-key-rotation-scheduler-app/pkg/shell"
 	"testing"
 	"time"
-
-	"fyne.io/fyne/v2/app"
 )
 
 func TestNewTracker(t *testing.T) {
-	a := app.NewWithID("test-app")
-	p := a.Preferences()
-	pref.PREFERENCES = pref.New("test-app", p)
+
+	pref.PREFERENCES = pref.New("test-app", "{}", shell.New())
 
 	// replace the file
 	SetCurrent(Clean())
