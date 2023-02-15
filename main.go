@@ -67,7 +67,7 @@ func supported() (errs []string) {
 
 func init() {
 	// config the preferences data with info from cfg
-	pref.PREFERENCES = pref.New(cfg.AppName, preferences)
+	pref.PREFERENCES = pref.New(cfg.AppBuiltName, preferences, cfg.Shell)
 
 }
 

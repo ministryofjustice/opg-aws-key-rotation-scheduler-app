@@ -2,13 +2,14 @@ package tracker
 
 import (
 	"opg-aws-key-rotation-scheduler-app/pkg/pref"
+	"opg-aws-key-rotation-scheduler-app/pkg/shell"
 	"testing"
 	"time"
 )
 
 func TestNewTracker(t *testing.T) {
 
-	pref.PREFERENCES = pref.New("test-app", "{}")
+	pref.PREFERENCES = pref.New("test-app", "{}", shell.New())
 
 	// replace the file
 	SetCurrent(Clean())

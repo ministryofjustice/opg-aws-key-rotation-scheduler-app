@@ -2,6 +2,7 @@ package pref
 
 import (
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
+	"opg-aws-key-rotation-scheduler-app/pkg/shell"
 	"time"
 )
 
@@ -11,6 +12,7 @@ type PrefData[T string | bool | int | time.Duration] struct {
 	ParseFunc func(res string) (T, error)
 
 	value   interface{}
+	sh      *shell.Shell
 	pref    *map[string]string
 	appName *string
 }
@@ -30,7 +32,7 @@ func (pd *PrefData[T]) Get() (value T) {
 		got = val
 	}
 	// overwite from env variables
-	if envVal, ok := env(*pd.appName, pd.Key); ok {
+	if envVal, ok := env(*pd.appName, pd.Key, pd.sh); ok {
 		got = envVal
 	}
 	pf := pd.ParseFunc
@@ -42,9 +44,10 @@ func (pd *PrefData[T]) Get() (value T) {
 func newPD[T string | bool | int | time.Duration](
 	appName *string,
 	pref *map[string]string,
+	sh *shell.Shell,
 	key string,
 	fallback string,
 	parse func(res string) (T, error),
 ) PrefData[T] {
-	return PrefData[T]{Key: key, Fallback: fallback, ParseFunc: parse, appName: appName, pref: pref}
+	return PrefData[T]{Key: key, Fallback: fallback, ParseFunc: parse, appName: appName, pref: pref, sh: sh}
 }
