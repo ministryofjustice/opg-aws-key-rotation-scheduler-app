@@ -9,6 +9,8 @@ import (
 	"opg-aws-key-rotation-scheduler-app/pkg/tracker"
 	"strconv"
 	"time"
+
+	"fyne.io/systray"
 )
 
 // UpdateMenu is called frequently via a go routine to check the status
@@ -40,12 +42,10 @@ func UpdateMenu() {
 	} else if !valid && cfg.IsBooting {
 		MenuRotatingSoon()
 	} else {
-		menuInformation.Label = fmt.Sprintf(
-			labels.NextRotation,
-			Track.ExpiresAt().Format(dateTimeFormat),
-		)
+		menuInformation.SetTitle(
+			fmt.Sprintf(labels.NextRotation, Track.ExpiresAt().Format(dateTimeFormat)))
 	}
-	menu.Refresh()
+
 	mu.Unlock()
 }
 
@@ -54,10 +54,13 @@ func UpdateMenu() {
 // cleanup the file and carry on
 func MenuOldLock() {
 	defer debugger.Log("gui.MenuOldLock()", debugger.INFO, "Key is locked and too old, so removing...")()
+
 	var err error = tracker.Unlock()
 	if err != nil {
 		panic(err)
 	}
+	menuRotate.Enable()
+	systray.SetIcon(icons.Default(cfg.IsDarkMode))
 }
 
 // MenuLocked updates gui to show that there is a
@@ -65,17 +68,16 @@ func MenuOldLock() {
 // a rotate is in progress
 func MenuLocked() {
 	defer debugger.Log("gui.MenuLocked()", debugger.INFO, "Key is locked...")()
-	menuRotate.Disabled = false
-	menuInformation.Label = labels.Locked
-	cfg.Desktop.SetSystemTrayIcon(icons.Locked(cfg.IsDarkMode))
-	menu.Refresh()
+	menuRotate.Enable()
+	menuInformation.SetTitle(labels.Locked)
+	systray.SetIcon(icons.Locked(cfg.IsDarkMode))
+	// menu.Refresh()
 }
 
 func MenuRotatingSoon() {
 	defer debugger.Log("gui.MenuWillRotate()", debugger.INFO, "Key will be rotated, show warning")()
-	cfg.Desktop.SetSystemTrayIcon(icons.RotatingSoon(cfg.IsDarkMode))
-	menuInformation.Label = labels.Rotating
-	menu.Refresh()
+	systray.SetIcon(icons.RotatingSoon(cfg.IsDarkMode))
+	menuInformation.SetTitle(labels.Rotating)
 }
 
 // MenuRotate handles the gui changes and func calls to change
@@ -86,11 +88,10 @@ func MenuRotate() {
 	if err != nil {
 		panic(err)
 	}
+	systray.SetIcon(icons.Rotating(cfg.IsDarkMode))
 
-	cfg.Desktop.SetSystemTrayIcon(icons.Rotating(cfg.IsDarkMode))
-	menuInformation.Label = labels.Rotating
-	menuRotate.Disabled = true
-	menu.Refresh()
+	menuInformation.SetTitle(labels.Rotating)
+	menuRotate.Disabled()
 
 	command := cfg.Vault.Command(cfg.Profile, cfg.Os)
 	sOut, sErr, err := cfg.Shell.Run([]string{command}, false)
@@ -105,19 +106,14 @@ func MenuRotate() {
 		Track, _ = tracker.SetCurrent(tracker.Clean())
 
 		debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotated successfully", "new tracker:", Track)()
-		menuInformation.Label = fmt.Sprintf(
-			labels.NextRotation,
-			Track.ExpiresAt().Format(dateTimeFormat),
-		)
-		menuRotate.Disabled = false
-		cfg.Desktop.SetSystemTrayIcon(icons.Default(cfg.IsDarkMode))
+		menuInformation.SetTitle(
+			fmt.Sprintf(labels.NextRotation, Track.ExpiresAt().Format(dateTimeFormat)))
+		menuRotate.Enable()
+		systray.SetIcon(icons.Default(cfg.IsDarkMode))
 
 	} else {
 		debugger.Log("gui.MenuRotate()", debugger.ERR, "Rotate failed", "err:", err, "stdErr:", sErr.String())()
-		cfg.Window = ErrorDialog(cfg.App, cfg.Window, []string{sErr.String(), err.Error()})
-		cfg.Window.Show()
 		MenuLocked()
 	}
-	menu.Refresh()
 
 }

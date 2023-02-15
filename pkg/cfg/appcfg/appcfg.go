@@ -7,6 +7,11 @@ import (
 	"opg-aws-key-rotation-scheduler-app/pkg/vault"
 )
 
+const (
+	AppId   string = "com.opg-aws-key-rotation.app"
+	AppName string = "OPG AWS Key Rotation"
+)
+
 // this app specific items that are shared
 var (
 	Shell      shell.Shell     // System supported shell
