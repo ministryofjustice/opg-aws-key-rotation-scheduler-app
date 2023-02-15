@@ -24,6 +24,6 @@ func env(appName string, name string, sh *shell.Shell) (v string, ok bool) {
 
 	nm := appName + "_" + name
 	v, ok = envCache[nm]
-	defer debugger.Log("pref.env()", debugger.INFO, "name:\t"+name, "env var:\t"+nm, "value:\t"+v)()
+	defer debugger.Log("pref.env()", debugger.INFO, "name:\t"+name, "env:\t"+nm, "value:\t"+v)()
 	return
 }
