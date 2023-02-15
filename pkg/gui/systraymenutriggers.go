@@ -94,7 +94,7 @@ func MenuRotate() {
 	menuRotate.Disabled()
 
 	command := cfg.Vault.Command(cfg.Profile, cfg.Os)
-	sOut, sErr, err := cfg.Shell.Run([]string{command}, false)
+	sOut, sErr, err := cfg.Shell.Run([]string{command}, false, true)
 
 	debugger.Log("gui.MenuRotate()", debugger.INFO, "Rotate command finished", "stdOut:", sOut, "stdErr:", sErr)()
 	if err == nil {

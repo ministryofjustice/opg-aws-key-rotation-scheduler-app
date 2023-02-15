@@ -32,7 +32,7 @@ func (os *Darwin) Supported() (supported bool) {
 func (os *Darwin) DarkMode(sh shell.Shell) (isDarkMode bool) {
 	isDarkMode = false
 	args := []string{darkModeCommand}
-	stdout, _, err := sh.Run(args, false)
+	stdout, _, err := sh.Run(args, false, true)
 	if err == nil {
 		mode := strings.ReplaceAll(strings.ToLower(stdout.String()), "\n", "")
 		isDarkMode = (mode == dark)
