@@ -11,16 +11,22 @@ import (
 	"fyne.io/systray"
 )
 
+var _running bool = true
+
 func SystraySetup() {
 
 	systray.SetIcon(icons.Default(cfg.IsDarkMode))
 	menuRotate = systray.AddMenuItem(labels.Rotate, labels.Rotate)
 	menuRotate.Enable()
 	go func() {
-		<-menuRotate.ClickedCh
-		mu.Lock()
-		MenuRotate()
-		mu.Unlock()
+		for _running {
+			<-menuRotate.ClickedCh
+			debugger.Log("go func <-menuRotate.ClickedCh", debugger.INFO, "clicked")()
+			mu.Lock()
+			MenuRotate()
+			mu.Unlock()
+		}
+
 	}()
 
 	systray.AddSeparator()
@@ -33,7 +39,9 @@ func SystraySetup() {
 	menuQuit.Enable()
 	go func() {
 		<-menuQuit.ClickedCh
+		debugger.Log("go func <-menuQuit.ClickedCh", debugger.INFO, "clicked")()
 		systray.Quit()
+		_running = false
 	}()
 
 	UpdateMenu()

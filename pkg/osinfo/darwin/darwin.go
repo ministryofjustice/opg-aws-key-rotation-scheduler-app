@@ -43,5 +43,5 @@ func (os *Darwin) DarkMode(sh shell.Shell) (isDarkMode bool) {
 
 func (os *Darwin) Errors(sh shell.Shell, app string, errors []string) {
 	cmd := fmt.Sprintf(`%s -e 'tell app "%s" to display alert "Errors" message "- %s" '`, os.Prompt(), app, strings.Join(errors, "\n - "))
-	sh.Run([]string{cmd}, false, true)
+	sh.Run([]string{cmd}, false, false)
 }
