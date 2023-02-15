@@ -17,8 +17,8 @@ const (
 
 type Darwin struct{}
 
-func (os *Darwin) Prompt() string {
-	defer debugger.Log("Darwin.Prompt()", debugger.VERBOSE, prompt)()
+func (os *Darwin) PromptCommand() string {
+	defer debugger.Log("Darwin.PromptCommand()", debugger.VERBOSE, prompt)()
 	return prompt
 }
 

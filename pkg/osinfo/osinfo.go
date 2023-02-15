@@ -8,7 +8,7 @@ import (
 
 type OsInfo interface {
 	Supported() bool
-	Prompt() string
+	PromptCommand() string
 	DarkMode(sh shell.Shell) bool
 	Errors(sh shell.Shell, appName string, errs []string)
 }
