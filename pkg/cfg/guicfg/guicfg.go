@@ -3,7 +3,6 @@ package guicfg
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/driver/desktop"
 )
 
 const (
@@ -12,13 +11,10 @@ const (
 )
 
 var (
-	App       fyne.App
-	Desktop   desktop.App
-	IsDesktop bool
+	App fyne.App
 )
 
 func init() {
 	// fyne app setup
 	App = app.NewWithID(AppId)
-	Desktop, IsDesktop = App.(desktop.App)
 }

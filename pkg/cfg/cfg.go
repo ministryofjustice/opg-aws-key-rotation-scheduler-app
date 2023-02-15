@@ -9,7 +9,6 @@ import (
 	"opg-aws-key-rotation-scheduler-app/pkg/vault"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/driver/desktop"
 )
 
 // -- all gui related settings merged int
@@ -19,9 +18,7 @@ const (
 )
 
 var (
-	App       fyne.App
-	Desktop   desktop.App
-	IsDesktop bool
+	App fyne.App
 )
 
 var (
@@ -36,7 +33,6 @@ var (
 
 func init() {
 	App = guicfg.App
-	Desktop = guicfg.Desktop
 
 	// -- app code required vars
 	Shell = appcfg.Shell     // System supported shell
@@ -44,7 +40,6 @@ func init() {
 	Profile = appcfg.Profile // Profile is what will be used in the aws-vault call
 	Vault = appcfg.Vault     // Vault (aws-vault) setup
 
-	IsDesktop = guicfg.IsDesktop
 	IsDarkMode = appcfg.IsDarkMode
 	IsBooting = appcfg.IsBooting
 
