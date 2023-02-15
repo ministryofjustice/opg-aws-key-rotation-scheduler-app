@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"opg-aws-key-rotation-scheduler-app/pkg/cfg"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
 	"opg-aws-key-rotation-scheduler-app/pkg/errors"
@@ -12,6 +13,9 @@ import (
 	"path/filepath"
 	"runtime/pprof"
 )
+
+//go:embed preferences.json
+var preferences string
 
 var (
 	Track         tracker.Track
@@ -62,7 +66,7 @@ func supported() (errs []string) {
 
 func init() {
 	// config the preferences data with info from cfg
-	pref.PREFERENCES = pref.New(cfg.AppName, cfg.Preferences)
+	pref.PREFERENCES = pref.New(cfg.AppName, preferences)
 
 }
 

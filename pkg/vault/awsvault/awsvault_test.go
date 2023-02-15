@@ -10,9 +10,8 @@ import (
 )
 
 func TestAwsVault(t *testing.T) {
-	a := app.NewWithID("test-app")
-	p := a.Preferences()
-	pref.PREFERENCES = pref.New("test-app", p)
+	app.NewWithID("test-app")
+	pref.PREFERENCES = pref.New("test-app", "{}")
 
 	v := &AwsVault{}
 	fmt.Println(v.Supported(shell.New()))

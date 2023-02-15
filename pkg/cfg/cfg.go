@@ -19,11 +19,10 @@ const (
 )
 
 var (
-	App         fyne.App
-	Preferences fyne.Preferences
-	Window      fyne.Window
-	Desktop     desktop.App
-	IsDesktop   bool
+	App       fyne.App
+	Window    fyne.Window
+	Desktop   desktop.App
+	IsDesktop bool
 )
 
 var (
@@ -38,7 +37,6 @@ var (
 
 func init() {
 	App = guicfg.App
-	Preferences = guicfg.Preferences
 	Window = guicfg.Window
 	Desktop = guicfg.Desktop
 

@@ -12,17 +12,15 @@ const (
 )
 
 var (
-	App         fyne.App
-	Preferences fyne.Preferences
-	Window      fyne.Window
-	Desktop     desktop.App
-	IsDesktop   bool
+	App       fyne.App
+	Window    fyne.Window
+	Desktop   desktop.App
+	IsDesktop bool
 )
 
 func init() {
 	// fyne app setup
 	App = app.NewWithID(AppId)
-	Preferences = App.Preferences()
 	Window = App.NewWindow(AppName)
 	Desktop, IsDesktop = App.(desktop.App)
 }

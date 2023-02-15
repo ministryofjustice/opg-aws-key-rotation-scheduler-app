@@ -10,8 +10,8 @@ import (
 )
 
 func TestAwsProfileSupported(t *testing.T) {
-	a := app.NewWithID("test-app")
-	pref.PREFERENCES = pref.New("test-app", a.Preferences())
+	app.NewWithID("test-app")
+	pref.PREFERENCES = pref.New("test-app", "{}")
 
 	p := &AwsProfile{}
 
