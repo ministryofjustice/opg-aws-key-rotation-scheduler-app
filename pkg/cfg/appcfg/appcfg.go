@@ -5,11 +5,16 @@ import (
 	"opg-aws-key-rotation-scheduler-app/pkg/profile"
 	"opg-aws-key-rotation-scheduler-app/pkg/shell"
 	"opg-aws-key-rotation-scheduler-app/pkg/vault"
+	"strings"
 )
 
 const (
 	AppId   string = "com.opg-aws-key-rotation.app"
 	AppName string = "OPG AWS Key Rotation"
+)
+
+var (
+	AppBuiltName string = strings.ReplaceAll(AppName, " ", "")
 )
 
 // this app specific items that are shared

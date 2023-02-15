@@ -113,6 +113,7 @@ func MenuRotate() {
 
 	} else {
 		debugger.Log("gui.MenuRotate()", debugger.ERR, "Rotate failed", "err:", err, "stdErr:", sErr.String())()
+		cfg.Os.Errors(cfg.Shell, cfg.AppBuiltName, []string{sErr.String(), err.Error()})
 		MenuLocked()
 	}
 

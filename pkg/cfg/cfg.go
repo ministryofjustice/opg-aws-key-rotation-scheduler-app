@@ -15,6 +15,9 @@ const (
 )
 
 var (
+	AppBuiltName = appcfg.AppBuiltName
+)
+var (
 	Shell   shell.Shell     // System supported shell
 	Os      osinfo.OsInfo   // Details about the Os
 	Profile profile.Profile // Profile is what will be used in the aws-vault call

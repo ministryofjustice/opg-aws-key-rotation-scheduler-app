@@ -93,6 +93,8 @@ func main() {
 	if len(supportErrors) == 0 {
 		cfg.IsDarkMode = cfg.Os.DarkMode(cfg.Shell)
 		gui.StartApp(Track)
+	} else {
+		cfg.Os.Errors(cfg.Shell, cfg.AppBuiltName, supportErrors)
 	}
 
 }

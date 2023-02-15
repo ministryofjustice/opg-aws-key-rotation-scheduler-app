@@ -10,6 +10,7 @@ type OsInfo interface {
 	Supported() bool
 	Prompt() string
 	DarkMode(sh shell.Shell) bool
+	Errors(sh shell.Shell, appName string, errs []string)
 }
 
 func New() (os OsInfo) {
