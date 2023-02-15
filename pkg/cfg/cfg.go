@@ -2,23 +2,16 @@ package cfg
 
 import (
 	"opg-aws-key-rotation-scheduler-app/pkg/cfg/appcfg"
-	"opg-aws-key-rotation-scheduler-app/pkg/cfg/guicfg"
 	"opg-aws-key-rotation-scheduler-app/pkg/osinfo"
 	"opg-aws-key-rotation-scheduler-app/pkg/profile"
 	"opg-aws-key-rotation-scheduler-app/pkg/shell"
 	"opg-aws-key-rotation-scheduler-app/pkg/vault"
-
-	"fyne.io/fyne/v2"
 )
 
 // -- all gui related settings merged int
 const (
-	AppName = guicfg.AppName
-	AppID   = guicfg.AppId
-)
-
-var (
-	App fyne.App
+	AppName = appcfg.AppName
+	AppID   = appcfg.AppId
 )
 
 var (
@@ -32,8 +25,6 @@ var (
 )
 
 func init() {
-	App = guicfg.App
-
 	// -- app code required vars
 	Shell = appcfg.Shell     // System supported shell
 	Os = appcfg.Os           // Details about the Os
