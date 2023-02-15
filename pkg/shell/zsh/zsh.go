@@ -91,7 +91,7 @@ func (sh *Zsh) Search(commandName string, withProfile bool) (path string, stdout
 	}
 
 	cmd := fmt.Sprintf("%s%s %s", pre, which, commandName)
-	stdout, stderr, err = sh.Run([]string{cmd}, false)
+	stdout, stderr, err = sh.Run([]string{cmd}, false, true)
 	path = stdout.String()
 
 	// if there is an error, and the result contains "not found", or if
@@ -109,7 +109,7 @@ func (sh *Zsh) Search(commandName string, withProfile bool) (path string, stdout
 }
 
 // Run creates and executes a cmd using zsh shell as a wrapper
-func (sh *Zsh) Run(args []string, withProfile bool) (stdout *strings.Builder, stderr *strings.Builder, err error) {
+func (sh *Zsh) Run(args []string, withProfile bool, withCache bool) (stdout *strings.Builder, stderr *strings.Builder, err error) {
 	var pre string
 	var pErr error
 
@@ -126,7 +126,7 @@ func (sh *Zsh) Run(args []string, withProfile bool) (stdout *strings.Builder, st
 	}
 	cmdArgs = append(cmdArgs, args...)
 
-	if cached, found := fromCache(shell, cmdArgs); found {
+	if cached, found := fromCache(shell, cmdArgs); withCache && found {
 		stdout = cached.Stdout
 		stderr = cached.Stderr
 		err = cached.Err
