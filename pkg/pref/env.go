@@ -1,20 +1,29 @@
 package pref
 
 import (
-	"fmt"
 	"opg-aws-key-rotation-scheduler-app/pkg/debugger"
-	"os"
+	"opg-aws-key-rotation-scheduler-app/pkg/shell"
 	"strings"
 )
 
-func env(appName string, name string) (v string, ok bool) {
-	ok = false
-	app := strings.ReplaceAll(appName, " ", "")
-	name = fmt.Sprintf("%s_%s", app, name)
-	if envVar := os.Getenv(name); len(envVar) > 0 {
-		v = envVar
-		ok = true
+var envCache map[string]string = map[string]string{}
+
+func env(appName string, name string, sh *shell.Shell) (v string, ok bool) {
+	// generate env cache
+	if _, set := envCache["_boot"]; !set {
+		debugger.Log("pref.env()", debugger.INFO, "creating env cache")()
+		_sh := *sh
+		for k, v := range _sh.Env() {
+			if strings.Contains(k, appName) {
+				envCache[k] = v
+			}
+		}
+		envCache["_boot"] = "set"
+		debugger.Log("pref.env()", debugger.INFO, "env cache:", envCache)()
 	}
-	defer debugger.Log("pref.env()", debugger.INFO, "key:"+name, "value", v)()
+
+	nm := appName + "_" + name
+	v, ok = envCache[nm]
+	defer debugger.Log("pref.env()", debugger.INFO, "name:\t"+name, "env:\t"+nm, "value:\t"+v)()
 	return
 }

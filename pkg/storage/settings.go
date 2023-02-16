@@ -14,17 +14,24 @@ var (
 )
 
 const (
-	path string = ".opg/aws-key-rotation"
+	path     string = ".opg/aws-key-rotation"
+	perfPath string = "pref"
 )
 
 func init() {
 	// directory storage
 	UserHome, _ := os.UserHomeDir()
-	storageDirectory = filepath.Join(UserHome, path)
+	storageDirectory = filepath.Clean(filepath.Join(UserHome, path))
 }
 
 func ProfileDirectory() string {
-	perfProfileDirectory, _ = os.Getwd()
+	perfProfileDirectory = filepath.Clean(filepath.Join(StorageDirectory(), perfPath))
+	if _, dirErr := os.Stat(perfProfileDirectory); os.IsNotExist(dirErr) {
+		err := os.MkdirAll(perfProfileDirectory, StoragePermissionMode)
+		if err != nil {
+			panic(err)
+		}
+	}
 	return perfProfileDirectory
 }
 
